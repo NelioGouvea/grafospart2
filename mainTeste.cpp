@@ -10,7 +10,7 @@
 #include "Algoritmos/OrdenacaoTopologica.h"
 #include "Algoritmos/PinkFloyd.h"
 #include "Algoritmos/Prim.h"
-
+#include "Algoritmos/dcMST.h"
 
 
 using namespace std;
@@ -35,8 +35,8 @@ int main()
     grafo->inserirAresta(2, 4, 3);
     grafo->inserirAresta(3, 4, 2);
     grafo->inserirAresta(5, 4, 3); 
-    grafo->inserirAresta(6, 5, -3);
-    grafo->inserirAresta(4,6,2);
+    grafo->inserirAresta(6, 5, 4);
+    grafo->inserirAresta(4, 6, 2);
 
 
     std::cout << "Numero de arestas : " << grafo->getNumeroArestas() << endl << endl;
@@ -44,6 +44,9 @@ int main()
     grafo->criaListaAdjacencia();
     //grafo->imprimeListaAdjacencia();
 
-    cout << endl << "CUSTO : \n" << custoPinkFloyd(grafo, 1, 6)<<endl;
-     Dijkstra(grafo,1,6);
+    int conjunto[] = {1,2,3,4,5,6};
+    Grafo *mst =  dcMST(grafo, 3, 6, conjunto);
+
+    mst->criaListaAdjacencia();
+    mst->imprimeListaAdjacencia();
 }
