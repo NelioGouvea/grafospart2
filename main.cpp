@@ -131,10 +131,10 @@ int menu()
     cout << "----" << endl;
     cout << "[1] Fecho Transitivo Direto" << endl;
     cout << "[2] Fecho Transitivo Indireto" << endl;
-    cout << "[3] Caminho Mínimo entre dois vertices - Dijkstra" << endl;
-    cout << "[4] Caminho Mínimo entre dois vertices - Floyd" << endl;
-    cout << "[5] Arvore Geradora Mínima de Prim" << endl;
-    cout << "[6] Arvore Geradora Mínima de Kruskal" << endl;
+    cout << "[3] Caminho Minimo entre dois vertices - Dijkstra" << endl;
+    cout << "[4] Caminho Minimo entre dois vertices - Floyd" << endl;
+    cout << "[5] Arvore Geradora Minima de Prim" << endl;
+    cout << "[6] Arvore Geradora Minima de Kruskal" << endl;
     cout << "[7] Imprimir caminhamento em profundidade" << endl;
     cout << "[8] Imprimir ordenacao topologica" << endl;
     cout << "[0] Sair" << endl;
@@ -154,28 +154,56 @@ void preencheDot(ofstream &output_file, Grafo *grafo, string nome)
     {
         output_file << "strict graph " << nome << "{ " << endl;
     }
+    grafo->criaListaAdjacencia();
     list<No *> listaNos = grafo->getListaNos();
-
     list<No *>::iterator noIt;
     for (noIt = listaNos.begin(); noIt != listaNos.end(); noIt++)
     {
         list<No *> adj = (*noIt)->getNosAdjacentes();
-        list<No *>::iterator adjIt;
-        for (adjIt = adj.begin(); adjIt != adj.end(); adjIt++)
+        if (!adj.empty())
         {
-            output_file << (*noIt)->getId() << " -- " << (*adjIt)->getId() << endl;
+            list<No *>::iterator adjIt;
+            for (adjIt = adj.begin(); adjIt != adj.end(); adjIt++)
+            {
+                if (grafo->getDirecionado())
+                {
+                    output_file << (*noIt)->getId() << " -> " << (*adjIt)->getId() << endl;
+                }
+                else
+                {
+                    output_file << (*noIt)->getId() << " -- " << (*adjIt)->getId() << endl;
+                }
+            }
         }
     }
 
-    output_file << " } " << endl << endl;
+    output_file << " } " << endl
+                << endl;
 }
+
+//Preenche os grafos sem arestas como lista de vertices no output
+void preencheFechos(ofstream &output_file, Grafo *grafo, string nome)
+{
+
+    list<No *> listaNos = grafo->getListaNos();
+    list<No *>::iterator noIt;
+    output_file << "Vertices do Fecho " << nome << " : " << endl;
+    for (noIt = listaNos.begin(); noIt != listaNos.end(); noIt++)
+    {
+        output_file << (*noIt)->getId() << " - ";
+    }
+
+    output_file << endl
+                << endl;
+}
+
 void selecionar(int selecao, Grafo *graph, ofstream &output_file)
 {
 
     switch (selecao)
     {
 
-    //Fecho Transitivo Direto usando um Grafo Direcionado
+    //Fecho Transitivo Direto
     case 1:
     {
         if (graph->getDirecionado())
@@ -183,16 +211,16 @@ void selecionar(int selecao, Grafo *graph, ofstream &output_file)
             int id;
             cout << "Digite o Identificador do vertice: " << endl;
             cin >> id;
-            fechoDireto(graph, id);
+            Grafo *novo = fechoDireto(graph, id);
+            preencheFechos(output_file, novo, "Direto");
+            break;
         }
         else
         {
             cout << "ERRO: Grafo invalido, tente usar um grafo direcionado" << endl;
         }
-
         break;
     }
-
     //Fecho Transitivo Indireto usando um Grafo Direcionado
     case 2:
     {
@@ -202,7 +230,7 @@ void selecionar(int selecao, Grafo *graph, ofstream &output_file)
             cout << "Digite o Identificador do vertice: " << endl;
             cin >> id;
             Grafo *novo = FechoIndireto(graph, id);
-            preencheDot(output_file, novo, "Fecho Transitivo Indireto");
+            preencheFechos(output_file, novo, "Indireto");
         }
         else
         {
@@ -222,31 +250,41 @@ void selecionar(int selecao, Grafo *graph, ofstream &output_file)
 
         float caminho = Dijkstra(graph, id1, id2);
 
-        if(caminho == 9999999)
+        if (caminho == 9999999)
+        {
             cout << "Sem caminho direto entre os nos " << id1 << " e " << id2 << endl;
-        else
-            cout << "Caminho entre os nos " << id1 << " e " << id2 << " : " << caminho << endl;
+            output_file << "Sem caminho direto entre os nos " << id1 << " e " << id2 << endl;
+        }
 
+        else
+        {
+            cout << "Caminho entre os nos " << id1 << " e " << id2 << " : " << caminho << endl;
+            output_file << "Caminho entre os nos " << id1 << " e " << id2 << " : " << caminho << endl;
+        }
         break;
     }
 
         //Caminho mínimo entre dois vértices usando Floyd;
     case 4:
     {
-        if (graph->getDirecionado())
-        {
-            int id1, id2;
-            cout << "Digite o Identificador do primeiro vertice: " << endl;
-            cin >> id1;
-            cout << "Digite o Identificador do segundo vertice: " << endl;
-            cin >> id2;
 
-            float custo = custoPinkFloyd(graph, id1, id2);
+        int id1, id2;
+        cout << "Digite o Identificador do primeiro vertice: " << endl;
+        cin >> id1;
+        cout << "Digite o Identificador do segundo vertice: " << endl;
+        cin >> id2;
+
+        float custo = custoPinkFloyd(graph, id1, id2);
+        if (custo == -99999)
+        {
+            cout << "Sem caminho direto entre os nos " << id1 << " e " << id2 << endl;
+            output_file << "Sem caminho direto entre os nos " << id1 << " e " << id2 << endl;
         }
+
         else
         {
-
-            cout << "ERRO: Grafo invalido, tente usar um grafo direcionado" << endl;
+            cout << "Caminho entre os nos " << id1 << " e " << id2 << " : " << custo << endl;
+            output_file << "Caminho entre os nos " << id1 << " e " << id2 << " : " << custo << endl;
         }
 
         break;
@@ -255,23 +293,35 @@ void selecionar(int selecao, Grafo *graph, ofstream &output_file)
         //AGM Prim;
     case 5:
     {
-
-        list<int> subconjunto;
-        int id = 0;
-        int cont = 1;
-        cout << "Digite os identificadores para adicionar ao subconjunto, ao termino digite -1 para finalizar as insercoes" << endl;
-        while (id != -1)
+        if (!graph->getDirecionado())
         {
+            list<int> subconjunto;
+            int id = 0;
+            int cont = 1;
+            cout << "Digite os identificadores para adicionar ao subconjunto, ao termino digite -1 para finalizar as insercoes" << endl;
+            while (id != -1)
+            {
 
-            cout << "Digite o elemento " << cont << " : ";
-            cin >> id;
-            subconjunto.push_back(id);
-            cont++;
+                cout << "Digite o elemento " << cont << " : ";
+                cin >> id;
+                if (id != -1)
+                {
+                    subconjunto.push_back(id);
+                }
+
+                cont++;
+            }
+            cout << endl;
+
+            cout << "Entrando em PRIM" << endl;
+            Grafo *arvore = Prim(graph, subconjunto);
+            preencheDot(output_file, arvore, "Prim");
         }
-        cout << endl;
+        else
+        {
+            cout << "ERRO: Grafo invalido, tente usar um grafo direcionado" << endl;
+        }
 
-        Grafo *arvore = Prim(graph, subconjunto);
-        preencheDot(output_file, arvore, "Prim");
         break;
     }
 
@@ -301,8 +351,8 @@ void selecionar(int selecao, Grafo *graph, ofstream &output_file)
             i++;
         }
 
-        Grafo *arvore = kruskal(graph, subconjuntoVet, subconjunto.size());
-        preencheDot(output_file, graph, "Kruskal");
+        Grafo *arvore = kruskal(graph, subconjuntoVet, i - 1);
+        preencheDot(output_file, arvore, "Kruskal");
         break;
     }
     //Caminhamento em Profundidade
@@ -313,13 +363,12 @@ void selecionar(int selecao, Grafo *graph, ofstream &output_file)
         cin >> id;
 
         Grafo *arvore = graph->caminhamentoProfundidade(id);
-        preencheDot(output_file, graph, "Caminhamento");
+        preencheFechos(output_file, arvore, "Caminhamento");
         break;
     }
     //Ordenação Topologica;
     case 8:
     {
-
         OrdenacaoTopologica(graph);
         break;
     }

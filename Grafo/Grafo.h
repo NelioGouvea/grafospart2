@@ -19,7 +19,6 @@ private:
     bool ponderadoAresta;
     bool ponderadoNo;
     list<No *> listaNo;
-
     list<list<No *>> listaAdjacencia;
 
 public:
@@ -51,10 +50,6 @@ public:
 
     void criaListaAdjacencia();
     void imprimeListaAdjacencia();
-
-    //faz uma busca em profundidade a partir de um vértice
-    bool buscaEmProfundidade(int valor);
-    int auxBuscaEmProfundidade(No *filho, int val, list<No *> listaVisitados, int teste);
     bool verificaVisita(No *no, list<No *> listaVisitados);
 
 private:

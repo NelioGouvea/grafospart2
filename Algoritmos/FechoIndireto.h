@@ -46,13 +46,11 @@ Grafo* FechoIndireto(Grafo *grafo, int idAlvo) {
 
     Grafo *novoGrafo = new Grafo(0, false, false, false);
 
-    cout << "Fecho Transitivo Indireto do no " << idAlvo << ": " << endl;
+
     for(noAtual = fecho.begin(); noAtual != fecho.end(); noAtual++)
         if((*noAtual) != noAlvo) {
-            cout << (*noAtual)->getId() << " ";
             novoGrafo->inserirNo((*noAtual)->getId());
         }
-    cout << endl;
 
     return novoGrafo;
 }

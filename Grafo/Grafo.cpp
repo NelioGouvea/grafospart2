@@ -223,63 +223,6 @@ void Grafo::imprimeListaAdjacencia()
     cout << endl;
 }
 
-bool Grafo::buscaEmProfundidade(int valor)
-{
-    No *no = listaNo.front();
-    list<No *> listaVisitados;
-    int teste = 0;
-
-    if (no->getId() == valor)
-        return true;
-
-    if (auxBuscaEmProfundidade(no, valor, listaVisitados, teste) == 0)
-    {
-        cout << auxBuscaEmProfundidade(no, valor, listaVisitados, teste) << endl;
-        return false;
-    }
-    else
-    {
-        cout << auxBuscaEmProfundidade(no, valor, listaVisitados, teste) << endl;
-        return true;
-    }
-}
-
-int Grafo::auxBuscaEmProfundidade(No *filho, int val, list<No *> listaVisitados, int teste)
-{
-    if (verificaVisita(filho, listaVisitados))
-    {
-
-        if (filho->getId() == val)
-        {
-            teste++;
-            return teste;
-        }
-
-        listaVisitados.push_back(filho);
-
-        list<No *> listaAdj;
-        list<list<No *>>::iterator noIterator;
-        int cont = 0;
-        for (noIterator = this->listaAdjacencia.begin(); noIterator != this->listaAdjacencia.end(); noIterator++)
-        {
-            if (cont == filho->getId())
-            {
-                listaAdj = (*noIterator);
-                break;
-            }
-            cont++;
-        }
-
-        list<No *>::iterator noIterador;
-        for (noIterador = listaAdj.begin(); noIterador != listaAdj.end(); noIterador++)
-        {
-            if (verificaVisita((*noIterador), listaVisitados))
-                return auxBuscaEmProfundidade((*noIterador), val, listaVisitados, teste);
-        }
-    }
-    return teste;
-}
-
 //Funcao para retornar a arvore dada pelo caminhamento em profundidade a partir de dado no parametro
 Grafo *Grafo::caminhamentoProfundidade(int id)
 {
