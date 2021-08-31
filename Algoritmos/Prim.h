@@ -1,7 +1,6 @@
 #ifndef PRIM_H_INCLUDED
 #define PRIM_H_INCLUDED
 
-
 #include <list>
 #include <iostream>
 #include <stdlib.h>
@@ -9,27 +8,17 @@
 #include "../Grafo/No.h"
 #include "../Grafo/Aresta.h"
 
-bool verificaArestaConectado(Aresta *aresta, int idNo)
-{
-
-    if (aresta->getAlvoId() == idNo)
-    {
-        return true;
-    }
-
-    return false;
-}
-
+//Verifica e retorna a aresta de menor peso do grafo
 Aresta *verificaArestaMenorPeso(Grafo *grafo)
 {
     Aresta *resultado;
     No *no;
     float menorPeso = -1;
     float pesoAresta = -1;
-    int fonteId = 0;
-    int alvoId = 0;
-    int fonteMin = 0;
-    int alvoMin = 0;
+    int fonteId = 1;
+    int alvoId = 1;
+    int fonteMin = 1;
+    int alvoMin = 1;
 
     list<list<No *>> listAdj = grafo->getListaAdjacencia();
     list<list<No *>>::iterator listNoIt;
@@ -63,17 +52,14 @@ Aresta *verificaArestaMenorPeso(Grafo *grafo)
     return resultado;
 }
 
+//Confere dentro dos vertices do grafo, qual vertice da aresta de menor peso eles estao mais perto
+//e retorna um vetor de inteiros, em que cada posição i refere ao vertice i+1 do grafo, e seu conteudo
+//informa o id do vertice mais proximo
 int *verificaVizinhoMaisProx(Grafo *grafo, Grafo *arvore, int size)
 {
 
     int *prox = new int[size];
-
-    float menorPeso = -1;
-    float pesoAresta = -1;
-    int fonteId = 0;
-    int alvoId = 0;
-    int fonteMin = 0;
-    int alvoMin = 0;
+    int fonteId = 1;
 
     for (int i = 0; i < size; i++)
     {
@@ -87,25 +73,23 @@ int *verificaVizinhoMaisProx(Grafo *grafo, Grafo *arvore, int size)
     list<No *>::iterator listNoIt;
     for (listNoIt = listAdj.begin(); listNoIt != listAdj.end(); listNoIt++)
     {
-
-        fonteId = (*listNoIt)->getId();
-
-        if (grafo->verificaPesoAresta(fonteId, u) < grafo->verificaPesoAresta(fonteId, v))
-        {
-            //cout << "Teste 0 " << endl;
-            pesoAresta = grafo->verificaPesoAresta(fonteId, u);
-            prox[fonteId] = u;
-        }
-        else
-        {
-            pesoAresta = grafo->verificaPesoAresta(fonteId, v);
-            prox[fonteId] = v;
-        }
+            fonteId = (*listNoIt)->getId();
+   
+            if (grafo->verificaPesoAresta(fonteId, u) < grafo->verificaPesoAresta(fonteId, v))
+            {
+                prox[fonteId-1] = u;
+            }
+            else
+            {
+                prox[fonteId-1] = v;
+            }
+    
     }
 
     return prox;
 }
 
+//Retorna dentre os vertices proximos o indice do vertice com menor custo
 int retornaJ(int *prox, float *aux, int size)
 {
 
@@ -125,81 +109,66 @@ int retornaJ(int *prox, float *aux, int size)
     }
     return menorIndex;
 }
+
+//Executa o algoritmo de Prim
 Grafo *Prim(Grafo *grafo, list<int> subconjunto)
 {
-
     Grafo *arvore = new Grafo(0, false, false, false);
 
+    //Verifica e retorna aresta de menor peso do grafo e insere a aresta na arvore
     Aresta *aresta = verificaArestaMenorPeso(grafo);
 
     arvore->inserirNo(aresta->getFonteId(), 0);
     arvore->inserirNo(aresta->getAlvoId(), 0);
-
     arvore->inserirAresta(aresta->getFonteId(), aresta->getAlvoId(), 0);
 
-    int size = grafo->getListaAdjacencia().size();
-
+    //inicializa o vetor que relaciona os vertices com o vizinho mais proximo
+    int size = grafo->getOrdem();
     int *prox = verificaVizinhoMaisProx(grafo, arvore, size);
 
-    prox[aresta->getFonteId()] = -1;
-    prox[aresta->getAlvoId()] = -1;
+    //atualiza os vertices já visitados
+    prox[aresta->getFonteId() - 1] = -1;
+    prox[aresta->getAlvoId() - 1] = -1;
 
+    //inicializa o vetor que relaciona os vertices com o peso do vizinho mais proximo
     float *aux = new float[size];
 
     for (int i = 0; i < size; i++)
     {
-        aux[i] = grafo->verificaPesoAresta(i, prox[i]);
+        aux[i] = grafo->verificaPesoAresta((i + 1), prox[i]);
     }
 
-    aux[aresta->getFonteId()] = -1;
-    aux[aresta->getAlvoId()] = -1;
+    //atualiza os vertices ja visitados
+    aux[aresta->getFonteId() - 1] = -1;
+    aux[aresta->getAlvoId() - 1] = -1;
 
     int cont = 0;
     int j = 0;
     int n = grafo->getOrdem();
-    // for (int i = 0; i < size; i++)
-    // {
-    //     cout << "Prox[" << i << "] : " << prox[i] << endl;
-    // }
-    // for (int i = 0; i < size; i++)
-    // {
-    //     cout << "Aux[" << i << "] : " << aux[i] << endl;
-    // }
 
     while (cont < (n - 2))
     {
+        //procura o proximo vertice a ser inserido, procurando pelos vertices nao visitados e com custo minimo
         j = retornaJ(prox, aux, size);
-        cout << "J : " << j << endl;
         if (prox[j] != -1)
         {
-            arvore->inserirNo(j, 0);
-            arvore->inserirAresta(j, prox[j], 0);
+            arvore->inserirNo((j + 1), 0);
+            arvore->inserirAresta((j + 1), prox[j], 0);
             prox[j] = -1;
         }
+
+        //atualiza a lista de proximos com base na proximidade deles com J,
         for (int i = 0; i < n; i++)
         {
 
-            if (prox[i] != -1 && (aux[i] > grafo->verificaPesoAresta(i, j)))
+            if (prox[i] != -1 && (aux[i] > grafo->verificaPesoAresta((i + 1), (j + 1))))
             {
-           
-                prox[i] = j;
-                aux[i] = grafo->verificaPesoAresta(i, j);
-               
+
+                prox[i] = j + 1;
+                aux[i] = grafo->verificaPesoAresta((i + 1), (j + 1));
             }
         }
-
         cont++;
-    }
-
-
-
-    for (int i = 0; i < size; i++)
-    {
-        cout << "Prox[" << i << "] : " << prox[i] << endl;
-    }
-    for (int i = 0; i < size; i++)
-    {
-        cout << "Aux[" << i << "] : " << aux[i] << endl;
     }
 
     return arvore;
