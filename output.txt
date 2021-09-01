@@ -17,8 +17,8 @@ strict graph Prim{
 strict graph Kruskal{ 
 1 -- 4
 1 -- 2
-2 -- 5
 2 -- 1
+2 -- 5
 3 -- 5
 4 -- 1
 4 -- 6
@@ -28,5 +28,6 @@ strict graph Kruskal{
 6 -- 4
 7 -- 5
  } 
+
 
 
