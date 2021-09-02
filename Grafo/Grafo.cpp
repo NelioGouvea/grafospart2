@@ -206,6 +206,7 @@ void Grafo::criaListaAdjacencia()
         this->listaAdjacencia.push_back(nosAdjacentes);
 
         (*noAtual)->setNosAdjacentes(nosAdjacentes);
+        (*noAtual)->setGrau(nosAdjacentes.size());
     }
 }
 

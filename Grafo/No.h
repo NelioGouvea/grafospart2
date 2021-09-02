@@ -14,6 +14,8 @@ private:
     int grauEntrada;
     int grauSaida;
 
+    int grau;
+
 public:
     //Construtor e destrutor
     No(int id, float peso);
@@ -45,6 +47,9 @@ public:
 
     void incrementaGrauEntrada(int val);
     void incrementaGrauSaida(int val);
+
+    int getGrau();
+    void setGrau(int val);
 };
 
 #endif // NO_H

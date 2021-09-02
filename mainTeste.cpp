@@ -10,11 +10,7 @@
 #include "Algoritmos/OrdenacaoTopologica.h"
 #include "Algoritmos/PinkFloyd.h"
 #include "Algoritmos/Prim.h"
-<<<<<<< HEAD
 #include "Algoritmos/dcMST.h"
-
-=======
->>>>>>> main
 
 using namespace std;
 
@@ -31,30 +27,6 @@ int main()
               << endl;
 
     std::cout << "Inserindo Arestas" << endl;
-<<<<<<< HEAD
-    
-    grafo->inserirAresta(1, 2, 1);
-    grafo->inserirAresta(2, 3, 1);
-    grafo->inserirAresta(3, 1, 3);
-    grafo->inserirAresta(2, 5, 2);
-    grafo->inserirAresta(2, 4, 3);
-    grafo->inserirAresta(3, 4, 2);
-    grafo->inserirAresta(5, 4, 3); 
-    grafo->inserirAresta(6, 5, 4);
-    grafo->inserirAresta(4, 6, 2);
-
-
-    std::cout << "Numero de arestas : " << grafo->getNumeroArestas() << endl << endl;
-
-    grafo->criaListaAdjacencia();
-    //grafo->imprimeListaAdjacencia();
-
-    int conjunto[] = {1,2,3,4,5,6};
-    Grafo *mst =  dcMST(grafo, 3, 6, conjunto);
-
-    mst->criaListaAdjacencia();
-    mst->imprimeListaAdjacencia();
-=======
 
     grafo->inserirAresta(1, 2, 4);
     grafo->inserirAresta(1, 4, 3);
@@ -70,7 +42,10 @@ int main()
 
     std::cout << "Numero de arestas : " << grafo->getNumeroArestas() << endl
               << endl;
-    int vetor[] = {1, 2, 3, 4, 5, 6};
-    Grafo *novo = kruskal(grafo, vetor, 6);
->>>>>>> main
+    
+    grafo->criaListaAdjacencia();
+    grafo->imprimeListaAdjacencia();
+
+
+    dcMST(grafo, 2);
 }

@@ -151,3 +151,11 @@ void No::incrementaGrauSaida(int val)
 {
     this->grauSaida += val;
 }
+
+int No::getGrau() {
+    return this->grau;
+}
+
+void No::setGrau(int val) {
+    this->grau = val;
+}
