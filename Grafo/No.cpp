@@ -57,6 +57,7 @@ float No::getY()
 {
     return this->y;
 }
+
 Aresta *No::getAresta(int alvoId)
 {
     Aresta *aresta;
@@ -112,6 +113,11 @@ void No::setX(float x)
 }
 void No::setY(float y)
 {
+    this->y = y;
+}
+void No::setCoordenadas(float x, float y)
+{
+    this->x = x;
     this->y = y;
 }
 void No::setNosAdjacentes(list<No *> nos)

@@ -21,6 +21,45 @@
 
 using namespace std;
 
+Grafo *leituraMST(ifstream &input_file)
+{
+    //Variáveis para auxiliar na criação dos nós no Grafo
+    int ordem;
+    int id;
+    float x, y;
+
+    //Pegando a ordem do grafo
+    input_file >> ordem;    
+
+    //Criando objeto grafo
+    Grafo *graph = new Grafo(ordem, 0, 1, 0);
+
+    while (input_file >> id >> x >> y)
+    {
+        graph->getNo(id)->setCoordenadas(x,y);
+    }
+
+    No *no1;
+    No *no2;
+    for(int i=1; i<=ordem; i++){
+        for(int j= i+1; j<=ordem; j++){
+            no1 = graph->getNo(i);
+            no2 = graph->getNo(j);
+            graph->inserirAresta(i,j,calculaPeso(no1->getX(), no1->getY(), no2->getX(), no2->getY()));
+        }
+    }
+
+    graph->criaListaAdjacencia();
+
+    return graph;
+}
+
+//função auxiliar para calcular peso das arestas 
+float calculaPeso(float x1, float y1, float x2, float y2)
+{
+    return (sqrt( (x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) ));
+}
+
 Grafo *leitura(ifstream &input_file, int directed, int weightedEdge, int weightedNode)
 {
 
