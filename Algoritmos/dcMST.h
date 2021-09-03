@@ -140,11 +140,20 @@ void dcMST(Grafo *grafo, int d) {
 				T->inserirNo((*vx)->getId());
 
 			T->inserirAresta(v2->getId(), (*vx)->getId(), v2->getAresta((*vx)->getId())->getPeso());
+			cout << v2->getId() << "--" << (*vx)->getId() << "--" << v2->getAresta((*vx)->getId())->getPeso() << endl;
+			cout << "peso = " << Wd[v2] << endl; 
 
 			v2->setGrau(v2->getGrau()+1);
 			(*vx)->setGrau((*vx)->getGrau()+1);
 
-			cout << "v2 = " << v2->getId() << " grau " << v2->getGrau() << endl;
+			if((*vx)->getGrau() == d) {
+				for(auto v = U.begin(); v != U.end(); v++) {
+					if(contem(Vd[*v], (*vx))) {
+						Vd[*v].remove(*vx);
+						Wd[*v] = Wd[*v] - (*v)->getAresta((*vx)->getId())->getPeso();
+					}
+				}
+			}
 
 			if(flag2 == 1) {
 				U.merge(Ws);
@@ -155,6 +164,7 @@ void dcMST(Grafo *grafo, int d) {
 		}
 
 		else {
+			
 			U.remove(v2);
 			Ws.push_back(v2);
 			flag2 = 1;
@@ -185,11 +195,15 @@ void dcMST(Grafo *grafo, int d) {
 		}
 	}
 
+	cout << endl;
 	T->criaListaAdjacencia();
 	T->imprimeListaAdjacencia();
 	auto lista = T->getListaNos();
 	for(auto a = lista.begin(); a != lista.end(); a++)
 		cout << (*a)->getId() << endl;
+
+	
+
 }
 
 #endif // DCMST_H_INCLUDED
