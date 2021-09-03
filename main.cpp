@@ -21,6 +21,13 @@
 
 using namespace std;
 
+//função auxiliar para calcular peso das arestas 
+float calculaPeso(float x1, float y1, float x2, float y2)
+{
+    return (sqrt( (x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) ));
+}
+
+
 Grafo *leituraMST(ifstream &input_file)
 {
     //Variáveis para auxiliar na criação dos nós no Grafo
@@ -52,12 +59,6 @@ Grafo *leituraMST(ifstream &input_file)
     graph->criaListaAdjacencia();
 
     return graph;
-}
-
-//função auxiliar para calcular peso das arestas 
-float calculaPeso(float x1, float y1, float x2, float y2)
-{
-    return (sqrt( (x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) ));
 }
 
 Grafo *leitura(ifstream &input_file, int directed, int weightedEdge, int weightedNode)
@@ -473,7 +474,7 @@ int main(int argc, char const *argv[])
     if (input_file.is_open())
     {
         cout << "Carregando grafo " << endl;
-        graph = leitura(input_file, atoi(argv[3]), atoi(argv[4]), atoi(argv[5]));
+        graph = leituraMST(input_file);
     }
     else
     {
