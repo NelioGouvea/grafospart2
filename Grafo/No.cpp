@@ -13,6 +13,12 @@ No::No(int id, float peso)
     this->peso = peso;
     this->id = id;
 }
+
+No::No(int id, float x, float y){
+    this->id = id;
+    this->x = x;
+    this->y = y;
+}
 No::No(int id)
 {
     this->id = id;
@@ -41,6 +47,15 @@ int No::getId()
 float No::getPeso()
 {
     return this->peso;
+}
+float No::getX()
+{
+    return this->x;
+}
+   
+float No::getY()
+{
+    return this->y;
 }
 
 Aresta *No::getAresta(int alvoId)
@@ -92,7 +107,14 @@ void No::setId(int id)
 {
     this->id = id;
 }
-
+void No::setX(float x)
+{
+    this->x = x;
+}
+void No::setY(float y)
+{
+    this->y = y;
+}
 void No::setNosAdjacentes(list<No *> nos)
 {
     this->nosAdjacentes = nos;

@@ -7,6 +7,8 @@ class No
 {
 private:
     float peso;
+    float x;
+    float y;
     int id;
     list<Aresta *> listaAresta;
     list<No *> nosAdjacentes;
@@ -17,12 +19,15 @@ private:
 public:
     //Construtor e destrutor
     No(int id, float peso);
+    No(int id, float x, float y);
     No(int id);
     No();
     ~No();
 
     //gets
     float getPeso();
+    float getX();
+    float getY();
     int getId();
     Aresta *getAresta(int alvoId);
     list<Aresta *> getListaAresta();
@@ -33,6 +38,8 @@ public:
 
     //sets
     void setPeso(float peso);
+    void setX(float x);
+    void setY(float y);
     void setId(int id);
     void setNosAdjacentes(list<No *> nos);
 
