@@ -10,6 +10,8 @@
 
 #include <iostream>
 
+#define INFINITO 9999999
+
 using namespace std;
 
 void execute_falha_segmentacao()
@@ -18,18 +20,18 @@ void execute_falha_segmentacao()
 	int test = *ponteiroperigoso;
 }
 
-void quickSort(No **vet, No *ref, int p, int q)
-{
-
-    float pivo = ref->getAresta(vet[(int)((p + q) / 2)]->getId())->getPeso();
+// funcao auxiliar que ordena um vetor de nohs
+// a ordenacao comparada pelo peso da aresta entre os nohs no vetor e um noh de referencia
+void quickSort(No **vet, No *noReferencia, int p, int q) {
+    float pivo = noReferencia->getAresta(vet[(int)((p + q) / 2)]->getId())->getPeso();
     int i = p;
     int j = q - 1;
 
     while (i <= j) {
-		while (ref->getAresta(vet[i]->getId())->getPeso() < pivo)
+		while (noReferencia->getAresta(vet[i]->getId())->getPeso() < pivo)
             i++;
 
-        while (ref->getAresta(vet[j]->getId())->getPeso() > pivo)
+        while (noReferencia->getAresta(vet[j]->getId())->getPeso() > pivo)
             j--;
 
         if (i <= j) {
@@ -43,14 +45,15 @@ void quickSort(No **vet, No *ref, int p, int q)
     }
 
     if (p < j)
-        quickSort(vet, ref, p, j + 1);
+        quickSort(vet, noReferencia, p, j + 1);
 
     if (i < q)
     {
-        quickSort(vet,ref, i, q);
+        quickSort(vet, noReferencia, i, q);
     }
 }
 
+// funcao auxiliar que verifica se um noh esta numa lista
 bool contem(list<No*> listaNo, No *noAlvo) {
     list<No*>::iterator noAtual;
     for(noAtual = listaNo.begin(); noAtual != listaNo.end(); noAtual++)
@@ -59,339 +62,405 @@ bool contem(list<No*> listaNo, No *noAlvo) {
     return false;                   
 }
 
-float dcMST(Grafo *grafo, int d) {
-	// calcula Wd, Vd
-	map<No*, int> Wd;
-	map<No*, list<No*>> Vd;
+// funcao que calcula o peso de um arvore
+float calculaPeso(Grafo *arvore) {
+	list<No*> listaNos = arvore->getListaNos();
+	list<No*> visitados;
+	
+	float total = 0;
+	for(auto a = listaNos.begin(); a != listaNos.end(); a++) {
+		list<No*> adjacentes = (*a)->getNosAdjacentes();
+		
+		for(auto b = adjacentes.begin(); b != adjacentes.end(); b++) 
+			if(!contem(visitados, (*b)))
+				total += (*a)->getAresta((*b)->getId())->getPeso();
+		
+		visitados.push_back(*a);
+	}
+	
+	return total;
+}
 
-	list<No*> V = grafo->getListaNos();
-	for(auto v = V.begin(); v != V.end(); v++) {
-		int tam = (*v)->getNosAdjacentes().size();
-		No **vet = new No*[tam];
+// funcao auxiliar que insere na arvore os nohs que ainda entao com grau 0
+void insereRestanteNos(list<No*> nosEstadoEspera, list<No*> nosVisitados, Grafo *arvore, int d) {
+	// lista auxiliar, inicialmente recebe uma copia da lista nosVisitados
+	// usada para achar nohs para inserir arestas
+	list<No*> listaAux = nosVisitados;
+	
+	// percorre a lista noEstadoEspera
+	for(auto noAtual = nosEstadoEspera.begin(); noAtual != nosEstadoEspera.end(); noAtual++) {
+		
+		No *noMenorPeso = listaAux.front();
+		float menorPeso = (*noAtual)->getAresta(noMenorPeso->getId())->getPeso();
 
-		list<No*> adj = (*v)->getNosAdjacentes(); int i = 0;
-		for(auto aux = adj.begin(); aux != adj.end(); aux++) {
-			vet[i] = (*aux); 
+		// procura pelo noh com a aresta com o menor peso
+		for(auto noAux = listaAux.begin(); noAux != listaAux.end(); noAux++) {
+			if((*noAtual)->getAresta((*noAux)->getId())->getPeso() < menorPeso) {
+				menorPeso = (*noAtual)->getAresta((*noAux)->getId())->getPeso();
+				noMenorPeso = (*noAux);
+			}
+		}
+
+		// insere o noAtual na arvore
+		if(arvore->getNo((*noAtual)->getId()) == nullptr)
+			arvore->inserirNo((*noAtual)->getId());
+
+		// insere o noMenorPeso na arvore
+		if(arvore->getNo(noMenorPeso->getId()) == nullptr)
+			arvore->inserirNo(noMenorPeso->getId());
+
+		// insere a aresta entre os dois na arvore
+		arvore->inserirAresta((*noAtual)->getId(), noMenorPeso->getId(), menorPeso);
+
+		// aumenta o grau dos dois nohs
+		(*noAtual)->setGrau((*noAtual)->getGrau() + 1);
+		noMenorPeso->setGrau(noMenorPeso->getGrau() + 1);
+		
+		// agora o noAtual tem uma aresta, ele eh inserido na listaAux
+		listaAux.push_back((*noAtual));
+
+		// se o noMenorPeso ficou com grau maximo, ele eh removido da listaAux
+		if(noMenorPeso->getGrau() == d)
+			listaAux.remove(noMenorPeso);
+	}
+}
+
+// fase um da heuristica
+void faseUm(Grafo *grafo, Grafo *arvore, int d) {
+	// guarda o peso de cada noh
+	map<No*, float> pesos;
+
+	// guarda a lista dos d-primeiros nohs adjacentes de cada noh
+	map<No*, list<No*>> dNosAdjacentes;
+
+	// lista de todos os nohs
+	list<No*> listaNosGrafo = grafo->getListaNos();
+	
+	// percorre a lista de nohs do grafo, calculando o peso e settando a lista de d nohs adjacentes de cada noh
+	for(auto noAtual = listaNosGrafo.begin(); noAtual != listaNosGrafo.end(); noAtual++) {
+		
+		// a lista dAdjacentes guarda os nohs em ordem crescente, de acordo com o peso da arestas entre os nohs
+		
+		int tamanho = (*noAtual)->getNosAdjacentes().size();
+		No **vet = new No*[tamanho]; // vetor auxilar 
+
+		list<No*> adjacentes = (*noAtual)->getNosAdjacentes(); 
+		int i = 0;
+		for(auto noAux = adjacentes.begin(); noAux != adjacentes.end(); noAux++) {
+			vet[i] = (*noAux); 
 			i++;
 		}
 
-		quickSort(vet, (*v), 0, tam);
+		// ordena o vetor
+		quickSort(vet, (*noAtual), 0, tamanho);
+		
+		float peso = 0; 
+		list<No*> dAdjacentes;
 
-		int peso = 0;
-		list<No*> dAdj;
+		// calcula o peso e setta a lista dNosAdjacentes de cada noh
 		for(int j = 0; j < d; j++) {
-			peso += (*v)->getAresta(vet[j]->getId())->getPeso();
-			dAdj.push_back(vet[j]);
+			peso += (*noAtual)->getAresta(vet[j]->getId())->getPeso();
+			dAdjacentes.push_back(vet[j]);
 		}
 
-		Wd[(*v)] = peso;
-		Vd[(*v)] = dAdj;
+		pesos[(*noAtual)] = peso;
+		dNosAdjacentes[(*noAtual)] = dAdjacentes;
 	}
 
-	// inicializa valores
-	Grafo *T = new Grafo(0, false, true, true);
-	list<No*> S;
-	list<No*> U = V;
+	// guarda os nohs visitados, inicialmente vazia
+	list<No*> nosVisitados;
+
+	// guarda os nohs nao visitados. inicialemente recebe um copia da lista de nohs do grafo
+	list<No*> nosNaoVisitados = listaNosGrafo;
 	int flag1 = 0, flag2 = 0;
 	int count = 0;
-	list<No*> Ws;
+	
+	// guarda os nohs que estao em estado de espera
+	list<No*> nosEstadoEspera;
 
-	list<No*> Vx;
+	// guarda os nohs que ficaram com grau maximo, grau igual a d
+	list<No*> nosGrauMaximo;
 
-	map<No*, int> mark;
-	for(auto i = V.begin(); i != V.end(); i++) { 
-		mark[(*i)] = 0;
-		(*i)->setGrau(0);
+	// setta o grau de todos os nohs pra 0
+	for(auto noAtual = listaNosGrafo.begin(); noAtual != listaNosGrafo.end(); noAtual++)
+		(*noAtual)->setGrau(0);
+
+	No *noMenorPeso = nosNaoVisitados.front();
+	float menorPeso = INFINITO;
+	
+	// procura pelo primeiro noh com menor peso
+	for(auto noAtual = nosNaoVisitados.begin(); noAtual != nosNaoVisitados.end(); noAtual++) {
+		if(pesos[(*noAtual)] < menorPeso) {
+			menorPeso = pesos[(*noAtual)];
+			noMenorPeso = (*noAtual);
+		}
 	}
 
-	No *v1;
-	int menor = 999999;
-	for(auto v = U.begin(); v != U.end(); v++) {
-		if(Wd[(*v)] < menor) {
-			menor = Wd[(*v)];
-			v1 = (*v);
-		}
-			
-	}
+	// insere o noMenorPeso na lista nosVisitados, remove da nosNaovisitados
+	nosVisitados.push_back(noMenorPeso);
+	nosNaoVisitados.remove(noMenorPeso);
 
-	mark[v1] = 1;
-	S.push_back(v1);
-	U.remove(v1);
-
-	int cont = 0;
-	while(!U.empty()) {
-		No *v2;
-		menor = 999999;
-		for(auto v = U.begin(); v != U.end(); v++) {
-			cout << U.size() << endl;
-			//cout << "peso do no "<< (*v)->getId() << " = "  << Wd[*v] << " ";
-			if(Wd[(*v)] <= menor) {
-				menor = Wd[(*v)];
-				v2 = (*v);
-			}	
+	while(!nosNaoVisitados.empty()) {
+		noMenorPeso = nosNaoVisitados.front();
+		menorPeso = INFINITO;
+		
+		// procura pelo noh com menor peso
+		for(auto noAtual = nosNaoVisitados.begin(); noAtual != nosNaoVisitados.end(); noAtual++) {
+			if(pesos[(*noAtual)] < menorPeso) {
+				menorPeso = pesos[(*noAtual)];
+				noMenorPeso = (*noAtual);
+			}
 		}
-		cout << "foi" << endl;
+		
 		flag1 = 0;
-
-		list<No*>::iterator vx;
-		for(vx = Vd[v2].begin(); vx != Vd[v2].end(); vx++) {
-			if(mark[(*vx)] == 1) {
+		
+		// guarda o primeiro noh na lista nosVisitados que faz parte dos dNosAdjacentes do noMenorPeso
+		list<No*>::iterator noAux;
+		
+		// percorre a lista dNosAdjacentes para encontrar o primeiro noh na lista nosVisitados
+		for(noAux = dNosAdjacentes[noMenorPeso].begin(); noAux != dNosAdjacentes[noMenorPeso].end(); noAux++) {
+			if(contem(nosVisitados, (*noAux))) {
 				flag1 = 1;
-				cout << "aqui" << endl;
 				break;
 			}
 		}
 
-		cout << "fos" << endl;
+		// se encontrou
 		if(flag1 == 1) {
-			cout << "aqui" << endl;
-			mark[v2] = 1;
-			S.push_back(v2);
-			U.remove(v2);
-
-			if(T->getNo(v2->getId()) == nullptr)
-				T->inserirNo(v2->getId());
 			
+			// insere o noMenorPeso na lista nosVisitados, remove da nosNaovisitados
+			nosVisitados.push_back(noMenorPeso);
+			nosNaoVisitados.remove(noMenorPeso);
 
-			if(T->getNo((*vx)->getId()) == nullptr)
-				T->inserirNo((*vx)->getId());
+			// insere o noMenorPeso na arvore
+			if(arvore->getNo(noMenorPeso->getId()) == nullptr)
+				arvore->inserirNo(noMenorPeso->getId());
 
-			T->inserirAresta(v2->getId(), (*vx)->getId(), v2->getAresta((*vx)->getId())->getPeso());
-			//cout << v2->getId() << "--" << (*vx)->getId() << "--" << v2->getAresta((*vx)->getId())->getPeso() << endl;
-			//cout << "peso = " << Wd[v2] << endl << endl; 
+			// insere o noAux na arvore
+			if(arvore->getNo((*noAux)->getId()) == nullptr)
+				arvore->inserirNo((*noAux)->getId());
 
-			v2->setGrau(v2->getGrau()+1);
-			(*vx)->setGrau((*vx)->getGrau()+1);
+			// insere um aresta entre eles, com o peso da aresta entre ele no grafo
+			arvore->inserirAresta(noMenorPeso->getId(), (*noAux)->getId(), noMenorPeso->getAresta((*noAux)->getId())->getPeso());
 
-			if((*vx)->getGrau() == d) {
-				Vx.push_back(*vx);
+			// aumenta o grau dos dois nohs
+			noMenorPeso->setGrau(noMenorPeso->getGrau()+1);
+			(*noAux)->setGrau((*noAux)->getGrau()+1);
+
+			// se o noAux ficou com grau maximo 
+			// o peso e a lista dNosAdjacentes de alguns nohs sao atualizados
+			if((*noAux)->getGrau() == d) {
 				
-				cout << "morri" << endl;
-				for(auto v = U.begin(); v != U.end(); v++) {
-					if(contem(Vd[*v], (*vx))) {
-						int tam = (*v)->getNosAdjacentes().size() - Vx.size();
-						No **vet = new No*[tam];
+				// insere o noAux na lista nosGrauMaximo
+				nosGrauMaximo.push_back((*noAux));
+				
+				// precorre a lista nosNaoVisitados
+				for(auto noAtual = nosNaoVisitados.begin(); noAtual != nosNaoVisitados.end(); noAtual++) {
+					
+					// se o noAux esta na lista dNosAdjacentes do noAtual, atualiza o peso e a lista
+					if(contem(dNosAdjacentes[*noAtual], (*noAux))) {
+						int tamanho = (*noAtual)->getNosAdjacentes().size() - nosGrauMaximo.size();
+						No **vetor = new No*[tamanho];
 
-						list<No*> adj = (*v)->getNosAdjacentes();
+						list<No*> adjacentes = (*noAtual)->getNosAdjacentes();
 						
-						for(auto aux = Vx.begin(); aux != Vx.end(); aux++)
-							adj.remove(*aux);
+						// remove os nos com grau maximo da lista de adjacentes do noAtual
+						for(auto aux = nosGrauMaximo.begin(); aux != nosGrauMaximo.end(); aux++)
+							adjacentes.remove(*aux);
 
 						int i = 0;
-						for(auto aux = adj.begin(); aux != adj.end(); aux++) {
-							vet[i] = (*aux); 
+						for(auto aux = adjacentes.begin(); aux != adjacentes.end(); aux++) {
+							vetor[i] = (*aux); 
 							i++;
 						}
 
-						quickSort(vet, (*v), 0, tam);
+						// ordena o vetor
+						quickSort(vetor, (*noAtual), 0, tamanho);
 
 						int peso = 0;
-						list<No*> dAdj;
+						list<No*> dAdjacentes;
 						for(int j = 0; j < d; j++) {
-							peso += (*v)->getAresta(vet[j]->getId())->getPeso();
-							dAdj.push_back(vet[j]);
+							peso += (*noAtual)->getAresta(vetor[j]->getId())->getPeso();
+							dAdjacentes.push_back(vetor[j]);
 						}
 
-						Wd[(*v)] = peso;
-						Vd[(*v)] = dAdj;
-
-						cout << endl << "Atualizou o: " << (*v)->getId() << endl << endl;
+						// o peso e a lista dNosAdjacentes sao atualizados
+						pesos[(*noAtual)] = peso;
+						dNosAdjacentes[(*noAtual)] = dAdjacentes;
 					}
 				}
 			}
 
 			if(flag2 == 1) {
-				cout << "======= AGORA =======" << endl;
-				cout << "cont 1 = " << cont << endl;
-				//U.merge(Ws);
-				//Ws.clear();
+				// faz a uniao da lista nosNaoVisitado com nosEstadoEspera
+				for(auto noAtual = nosEstadoEspera.begin(); noAtual != nosEstadoEspera.end(); noAtual++)
+					if(!contem(nosNaoVisitados, (*noAtual)))
+						nosNaoVisitados.push_back((*noAtual));
+
+				// limpa a lista nosEstadoEspera	
+				nosEstadoEspera.clear();
+				
 				count = 0;
 				flag2 = 0;
 			}
 		}
 
 		else {
-			cout << "======= AGORA =======" << endl;
-			cout << "cont = " << cont << endl;
-			U.remove(v2);
-			Ws.push_back(v2);
+			
+			// insere o noMenorPeso na lista nosVisitados, remove da nosNaovisitados
+			nosNaoVisitados.remove(noMenorPeso);
+			nosEstadoEspera.push_back(noMenorPeso);
+			
 			flag2 = 1;
 			count++;
 		}
-		cont++;
 	}
 
-	if(count > 0) {
-		for(auto i = Ws.begin(); i != Ws.end(); i++) {
-			No *minimo;
-			int menor = 99999;
-			for(auto j = S.begin(); j != S.end(); j++) {
-				if((*i)->getAresta((*j)->getId()) != nullptr) {
-					if((*i)->getAresta((*j)->getId())->getPeso() < menor) {
-						menor = (*i)->getAresta((*j)->getId())->getPeso();
-						minimo = (*j);
-					}
-				}
-			}
+	// se count maior que 0, entao existem nohs que ainda estao com grau 0
+	// a funcao insereRestanteNos eh chamada para inserir os nohs na arvore
+	if(count > 0)
+		insereRestanteNos(nosEstadoEspera, nosVisitados, arvore, d);
+}
 
-			if(T->getNo((*i)->getId()) == nullptr)
-				T->inserirNo((*i)->getId());
-			
-			if(T->getNo(minimo->getId()) == nullptr)
-				T->inserirNo(minimo->getId());
+// fase dois da heutistica
+void faseDois(Grafo *grafo, Grafo *arvore, int d) {
+	// guarda todos os nos da arvore
+	list<No*> listaNos = arvore->getListaNos();
 
-			T->inserirAresta((*i)->getId(), minimo->getId(), (*i)->getAresta(minimo->getId())->getPeso());
-		}
-	}
-
-	cout << endl;
-	T->criaListaAdjacencia();
-	T->imprimeListaAdjacencia();
-	auto lista = T->getListaNos();
-	for(auto a = lista.begin(); a != lista.end(); a++) {
-		cout << (*a)->getId() << " ";
-
-		list<No*> listaAdj = (*a)->getNosAdjacentes();
-		for(auto b = listaAdj.begin(); b != listaAdj.end(); b++)
-			cout << (*b)->getId() << " - ";
-		cout << endl;
-	}
-	cout << endl;
-
-	// percorre todos os nos de T || primeio estagio da fase 2
-	for(auto noAtual = lista.begin(); noAtual != lista.end(); noAtual++) {
+	// percorre todos os nos da arvore || primeio estagio da fase 2
+	for(auto noAtual = listaNos.begin(); noAtual != listaNos.end(); noAtual++) {
+		
 		// verifica os que tem grau igual a d
 		if((*noAtual)->getGrau() == d) {
 			
-			cout << "No = " << (*noAtual)->getId() << endl;
-			
 			// guarda a lista de arestas do noAtual
 			list<Aresta*> listaAresta = (*noAtual)->getListaAresta();
-			
+
 			for(auto arestaAtual = listaAresta.begin(); arestaAtual != listaAresta.end(); arestaAtual++) {
 
 				// no alvo da arestaAtual
-				No* noAlvo = T->getNo((*arestaAtual)->getAlvoId());
+				No* noAlvo = arvore->getNo((*arestaAtual)->getAlvoId());
 
 				// guarda a lista de arestas do noAlvo, aresta que estao no grafo
 				list<Aresta*> listaArestaAux = grafo->getNo(noAlvo->getId())->getListaAresta();
 				
 				for(auto arestaAux = listaArestaAux.begin(); arestaAux != listaArestaAux.end(); arestaAux++) {
-					
 					// verifica se o peso da arestaAux eh menor ou igual do que a atestaAtual
 					if((*arestaAux)->getPeso() <= (*arestaAtual)->getPeso()) {
 						
 						// no alvo do noAlvo
-						No* noAux = T->getNo((*arestaAux)->getAlvoId());
+						No* noAux = arvore->getNo((*arestaAux)->getAlvoId());
 
 						// verfica se o noAux nao eh o noAtual || se o grau do noAux eh menor que d || se o noAlvo e o noAux ja tem um aresta em T
-						if(noAux->getId() != (*noAtual)->getId() && noAux->getGrau() < d && noAlvo->getAresta(noAux->getId()) == nullptr) {
+						if(noAux->getId() != (*noAtual)->getId() && noAux->getGrau() < d && noAlvo->getAresta(noAux->getId()) == nullptr) {	
+							arvore->criaListaAdjacencia();
+							Grafo *aux = fechoDireto(arvore, (*noAtual)->getId());
 
-							// remove aresta entre o noAtual e o noAlvo
-							(*noAtual)->removerAresta(noAlvo->getId());
-							(*noAtual)->setGrau((*noAtual)->getGrau() - 1);
+							if(!aux->procuraNo(noAux->getId())) {
+								// remove aresta entre o noAtual e o noAlvo
+								(*noAtual)->removerAresta(noAlvo->getId());
+								(*noAtual)->setGrau((*noAtual)->getGrau() - 1);
 
-							noAlvo->removerAresta((*noAtual)->getId());
-							noAlvo->setGrau(noAlvo->getGrau() - 1);
+								noAlvo->removerAresta((*noAtual)->getId());
+								noAlvo->setGrau(noAlvo->getGrau() - 1);
 
-							// adciona aresta entre o noAlvo e noAux
-							T->inserirAresta(noAlvo->getId(), noAux->getId(), (*arestaAux)->getPeso());
-							T->criaListaAdjacencia();
+								(*noAtual)->getNosAdjacentes().remove(noAlvo);
+								noAlvo->getNosAdjacentes().remove((*noAtual));
+
+								// adciona aresta entre o noAlvo e noAux
+								arvore->inserirAresta(noAlvo->getId(), noAux->getId(), (*arestaAux)->getPeso());
+								arvore->criaListaAdjacencia();
+
+								break;
+							}
 						}
 					}
 				}
 			}
 		}
 	}
-
-	T->criaListaAdjacencia();
-	lista = T->getListaNos();
 	
-	for(auto a = lista.begin(); a != lista.end(); a++) {
-		cout << (*a)->getId() << " || ";
-
-		list<No*> listaAdj = (*a)->getNosAdjacentes();
-		for(auto b = listaAdj.begin(); b != listaAdj.end(); b++)
-			cout << (*b)->getId() << " - ";
-		cout << endl;
-	}
-	cout << endl;
+	arvore->criaListaAdjacencia();
+	listaNos = arvore->getListaNos();
 
 	// percorre todos os nos de T || segundo estagio da fase 2
-	for(auto noAtual = lista.begin(); noAtual != lista.end(); noAtual++) {
-		
+	for(auto noAtual = listaNos.begin(); noAtual != listaNos.end(); noAtual++) {
 		// verifica se o noAtual tem grau menor que d
 		if((*noAtual)->getGrau() < d) {
-
 			// guarda a lista de aresta de arestas do noAtual
 			list<Aresta*> listaAresta = (*noAtual)->getListaAresta();
 			
 			for(auto arestaAtual = listaAresta.begin(); arestaAtual != listaAresta.end(); arestaAtual++) {
 				
 				// no alvo da arestaAtual
-				No *noAlvo = T->getNo((*arestaAtual)->getAlvoId());
+				No *noAlvo = arvore->getNo((*arestaAtual)->getAlvoId());
 				
 				// guarda a lista de arestas do noAlvo, aresta que estao no grafo
 				list<Aresta*> listaArestaAux = grafo->getNo((*noAtual)->getId())->getListaAresta();
 
 				for(auto arestaAux = listaArestaAux.begin(); arestaAux != listaArestaAux.end(); arestaAux++) {
-					
+
 					// verfica se o peso da arestaAux eh menor do que a arestaAtual
 					if((*arestaAux)->getPeso() < (*arestaAtual)->getPeso()) {
 						
 						// guarda o no alvo do noAux
-						No *noAux = T->getNo((*arestaAux)->getAlvoId());
-						
+						No *noAux = arvore->getNo((*arestaAux)->getAlvoId());
+
 						// verifica se a aresta ja esta em T || se o grau do noAux nao eh 1, se for ele nao tera mais arestas || se o grau do noAux nao eh d
-						if((*noAtual)->getAresta(noAux->getId()) == nullptr && noAux->getGrau() > 1 && noAux->getGrau() < d) {
-							
-							// remove a aresta entre o noAtual e o noAlvo
-							(*noAtual)->removerAresta(noAlvo->getId());
-							(*noAtual)->setGrau((*noAtual)->getGrau() - 1);
+						if((*noAtual)->getAresta(noAux->getId()) == nullptr && noAlvo->getGrau() > 1  && noAux->getGrau() < d) {
+							arvore->criaListaAdjacencia();
+							Grafo *aux = fechoDireto(arvore, (*noAtual)->getId());
 
-							noAlvo->removerAresta((*noAtual)->getId());
-							noAlvo->setGrau(noAlvo->getGrau() - 1);
 
-							// insere a aresta entre o noAtual e o noAux
-							T->inserirAresta((*noAtual)->getId(), noAux->getId(), (*arestaAux)->getPeso());
-							T->criaListaAdjacencia();
+							if(!aux->procuraNo(noAux->getId())) {
+								// remove a aresta entre o noAtual e o noAlvo
+								(*noAtual)->removerAresta(noAlvo->getId());
+								(*noAtual)->setGrau((*noAtual)->getGrau() - 1);
+
+								noAlvo->removerAresta((*noAtual)->getId());
+								noAlvo->setGrau(noAlvo->getGrau() - 1);
+
+								// insere a aresta entre o noAtual e o noAux
+								arvore->inserirAresta((*noAtual)->getId(), noAux->getId(), (*arestaAux)->getPeso());
+								arvore->criaListaAdjacencia();
+								
+								break;
+							}
 						}				
 					}
 				}
 			}
 		}
 	}
+}
 
-	T->criaListaAdjacencia();
-	lista = T->getListaNos();
+Grafo* dcMST(Grafo *grafo, int d) {
+	Grafo *arvore = new Grafo(0, false, true, true);
+	faseUm(grafo, arvore, d);
+	arvore->criaListaAdjacencia();	
+	faseDois(grafo, arvore, d);
+
+	cout << arvore->getListaNos().size() << endl;
+	arvore->criaListaAdjacencia();
+	list<No*> lista = arvore->getListaNos();
 	
 	for(auto a = lista.begin(); a != lista.end(); a++) {
-		//cout << (*a)->getId() << " || ";
+	cout << (*a)->getId() << " || ";
 
 		list<No*> listaAdj = (*a)->getNosAdjacentes();
 		for(auto b = listaAdj.begin(); b != listaAdj.end(); b++)
-			//cout << (*b)->getId() << " - ";
+			cout << (*b)->getId() <<  " - peso " << (*a)->getAresta((*b)->getId())->getPeso() << " - ";
 		cout << endl;
 	}
 	cout << endl;
 
-	int total = 0;
-	for(auto a = lista.begin(); a != lista.end(); a++) {
-		//cout << (*a)->getId() << " || ";
+	float peso = calculaPeso(arvore);
 
-		list<No*> listaAdj = (*a)->getNosAdjacentes();
-		for(auto b = listaAdj.begin(); b != listaAdj.end(); b++) {
-			//cout << (*b)->getId() << " - ";
-			total += (*a)->getAresta((*b)->getId())->getPeso();
-		}
+	cout << "Peso da arvore = " << peso << endl;
 
+	//execute_falha_segmentacao();
 
-		cout << endl;
-	}
-	cout << endl;
-	cout << "Total = " << total/2 << endl;
-	execute_falha_segmentacao();
-	return total/2;
+	return arvore;
 }
 
 #endif // DCMST_H_INCLUDED

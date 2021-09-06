@@ -166,6 +166,7 @@ void No::removerAresta(int alvoId)
         {
             this->listaAresta.remove(*itLista);
             this->grauSaida--;
+            break;
         }
     }
 }

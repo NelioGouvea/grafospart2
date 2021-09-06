@@ -221,7 +221,7 @@ void Grafo::imprimeListaAdjacencia()
             cout << (*noAdjacente)->getId() << " ";
         cout << endl;
     }
-    cout << endl;
+    cout << endl << endl;
 }
 
 //Funcao para retornar a arvore dada pelo caminhamento em profundidade a partir de dado no parametro

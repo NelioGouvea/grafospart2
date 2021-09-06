@@ -17,6 +17,7 @@
 #include "Algoritmos/OrdenacaoTopologica.h"
 #include "Algoritmos/PinkFloyd.h"
 #include "Algoritmos/Prim.h"
+#include "Algoritmos/dcMST.h"
 #include <string>
 
 using namespace std;
@@ -24,7 +25,13 @@ using namespace std;
 //função auxiliar para calcular peso das arestas 
 float calculaPeso(float x1, float y1, float x2, float y2)
 {
-    return (sqrt( (x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) ));
+    float valF = sqrt( (x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) );
+    int valL = (int) valF;
+    float valR = valF - valL;   
+
+    if(valR >= 0.5)
+        return valL + 1;
+    return valL;
 }
 
 
@@ -177,6 +184,7 @@ int menu()
     cout << "[6] Arvore Geradora Minima de Kruskal" << endl;
     cout << "[7] Imprimir caminhamento em profundidade" << endl;
     cout << "[8] Imprimir ordenacao topologica" << endl;
+    cout << "[9] dcMST" << endl;
     cout << "[0] Sair" << endl;
 
     cin >> selecao;
@@ -410,6 +418,12 @@ void selecionar(int selecao, Grafo *graph, ofstream &output_file)
     case 8:
     {
         OrdenacaoTopologica(graph);
+        break;
+    }
+    case 9:
+    {
+        Grafo *arvore = dcMST(graph, 3);
+        preencheDot(output_file, arvore, "dcMST");
         break;
     }
     default:
