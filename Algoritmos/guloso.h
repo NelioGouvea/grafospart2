@@ -1,5 +1,5 @@
-#ifndef DCMST_H_INCLUDED
-#define DCMST_H_INCLUDED
+#ifndef GULOSO_H_INCLUDED
+#define GULOSO_H_INCLUDED
 
 #include "../Grafo/Grafo.h"
 #include "../Grafo/No.h"
@@ -297,3 +297,4 @@ void faseUm(Grafo *grafo, Grafo *arvore, int d) {
 	if(count > 0)
 		insereRestanteNos(nosEstadoEspera, nosVisitados, arvore, d);
 }
+#endif // GULOSO_H_INCLUDED

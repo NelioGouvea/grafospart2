@@ -17,7 +17,7 @@
 #include "Algoritmos/OrdenacaoTopologica.h"
 #include "Algoritmos/PinkFloyd.h"
 #include "Algoritmos/Prim.h"
-#include "Algoritmos/dcMST.h"
+#include "Algoritmos/gulosoRanzomizado.h"
 #include <string>
 
 using namespace std;
@@ -423,7 +423,7 @@ void selecionar(int selecao, Grafo *graph, ofstream &output_file)
     }
     case 9:
     {
-        Grafo *arvore = dcMST(graph, 3);
+        Grafo *arvore = gulosoRandomizado(graph, 3);
         preencheDot(output_file, arvore, "dcMST");
         break;
     }
