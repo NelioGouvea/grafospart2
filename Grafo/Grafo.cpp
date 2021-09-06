@@ -297,3 +297,8 @@ bool Grafo::verificaVisita(No *no, list<No *> listaVisitados)
     }
     return true;
 }
+
+void Grafo::arrumaVisitado() {
+    for(auto noAtual = listaNo.begin(); noAtual != listaNo.end(); noAtual++)
+        (*noAtual)->setVisitado(false);
+}

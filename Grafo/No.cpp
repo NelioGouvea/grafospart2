@@ -187,3 +187,11 @@ int No::getGrau() {
 void No::setGrau(int val) {
     this->grau = val;
 }
+
+bool No::getVisitado() {
+    return this->visitado;
+}
+
+void No::setVisitado(bool val) {
+    this->visitado = val;
+}

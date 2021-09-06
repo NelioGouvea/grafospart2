@@ -20,6 +20,7 @@ void execute_falha_segmentacao()
 	int test = *ponteiroperigoso;
 }
 
+
 // funcao auxiliar que ordena um vetor de nohs
 // a ordenacao comparada pelo peso da aresta entre os nohs no vetor e um noh de referencia
 void quickSort(No **vet, No *noReferencia, int p, int q) {
@@ -62,6 +63,32 @@ bool contem(list<No*> listaNo, No *noAlvo) {
     return false;                   
 }
 
+
+bool aciclico(int id, int alvo, Grafo *agm){
+    No *v = agm->getNo(id);
+
+	list<No*> lista = v->getNosAdjacentes();
+    for (auto i = lista.begin(); i != lista.end(); i++){
+        No *aux =  (*i);
+		if(aux->getId() == alvo)
+            return false;
+        
+		No* vAdj = agm->getNo(aux->getId());
+        
+		if(!vAdj->getVisitado()) {
+            vAdj->setVisitado(true);
+            if(!aciclico(aux->getId(), alvo, agm))
+                return false;
+        }
+    }
+    return true;//volta a lista no final
+}
+
+bool verAciclico(int id, int alvo, Grafo *agm){
+	agm->arrumaVisitado();
+    bool ver = aciclico(id, alvo, agm);
+    return ver;
+}
 // funcao que calcula o peso de um arvore
 float calculaPeso(Grafo *arvore) {
 	list<No*> listaNos = arvore->getListaNos();
@@ -353,10 +380,8 @@ void faseDois(Grafo *grafo, Grafo *arvore, int d) {
 
 						// verfica se o noAux nao eh o noAtual || se o grau do noAux eh menor que d || se o noAlvo e o noAux ja tem um aresta em T
 						if(noAux->getId() != (*noAtual)->getId() && noAux->getGrau() < d && noAlvo->getAresta(noAux->getId()) == nullptr) {	
-							arvore->criaListaAdjacencia();
-							Grafo *aux = fechoDireto(arvore, (*noAtual)->getId());
-
-							if(!aux->procuraNo(noAux->getId())) {
+							
+							if(verAciclico(noAlvo->getId(), noAux->getId(), arvore)) {
 								// remove aresta entre o noAtual e o noAlvo
 								(*noAtual)->removerAresta(noAlvo->getId());
 								(*noAtual)->setGrau((*noAtual)->getGrau() - 1);
@@ -373,6 +398,7 @@ void faseDois(Grafo *grafo, Grafo *arvore, int d) {
 
 								break;
 							}
+							
 						}
 					}
 				}
@@ -408,11 +434,8 @@ void faseDois(Grafo *grafo, Grafo *arvore, int d) {
 
 						// verifica se a aresta ja esta em T || se o grau do noAux nao eh 1, se for ele nao tera mais arestas || se o grau do noAux nao eh d
 						if((*noAtual)->getAresta(noAux->getId()) == nullptr && noAlvo->getGrau() > 1  && noAux->getGrau() < d) {
-							arvore->criaListaAdjacencia();
-							Grafo *aux = fechoDireto(arvore, (*noAtual)->getId());
-
-
-							if(!aux->procuraNo(noAux->getId())) {
+							
+							if(verAciclico(noAlvo->getId(), noAux->getId(), arvore)) {
 								// remove a aresta entre o noAtual e o noAlvo
 								(*noAtual)->removerAresta(noAlvo->getId());
 								(*noAtual)->setGrau((*noAtual)->getGrau() - 1);

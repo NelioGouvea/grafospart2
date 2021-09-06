@@ -52,6 +52,7 @@ public:
     void imprimeListaAdjacencia();
     bool verificaVisita(No *no, list<No *> listaVisitados);
 
+    void arrumaVisitado();
 private:
 };
 

@@ -18,6 +18,8 @@ private:
 
     int grau;
 
+    bool visitado;
+
 public:
     //Construtor e destrutor
     No(int id, int peso);
@@ -58,6 +60,9 @@ public:
 
     int getGrau();
     void setGrau(int val);
+
+    bool getVisitado();
+    void setVisitado(bool val);
 };
 
 #endif // NO_H
