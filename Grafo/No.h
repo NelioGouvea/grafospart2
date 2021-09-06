@@ -20,7 +20,7 @@ private:
 
 public:
     //Construtor e destrutor
-    No(int id, float peso);
+    No(int id, int peso);
     No(int id);
     No(int id, float x, float y);
     No();
