@@ -15,7 +15,7 @@ No::No(int id, float x, float y)
     this->x = x;
     this->y = y;
 }
-No::No(int id, float peso)
+No::No(int id, int peso)
 {
     this->peso = peso;
     this->id = id;
@@ -45,7 +45,7 @@ int No::getId()
     return this->id;
 }
 //retorna o peso
-float No::getPeso()
+int No::getPeso()
 {
     return this->peso;
 }
@@ -98,7 +98,7 @@ int No::getGrauSaida()
 //setters
 
 //adiciona valor a variavel peso
-void No::setPeso(float peso)
+void No::setPeso(int peso)
 {
     this->peso = peso;
 }
@@ -125,7 +125,7 @@ void No::setNosAdjacentes(list<No *> nos)
     this->nosAdjacentes = nos;
 }
 
-void No::inserirAresta(int alvoId, float peso)
+void No::inserirAresta(int alvoId, int peso)
 {
     Aresta *aresta = new Aresta(alvoId, this->id, peso);
 

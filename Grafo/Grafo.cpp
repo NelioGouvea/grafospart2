@@ -79,7 +79,7 @@ bool Grafo::getPonderadoNo()
 }
 
 // OK
-void Grafo::inserirNo(int id, float peso)
+void Grafo::inserirNo(int id, int peso)
 {
     No *no = new No(id, peso);
 
@@ -117,7 +117,7 @@ list<No *> Grafo::getListaNos()
     return this->listaNo;
 }
 
-void Grafo::inserirAresta(int fonteId, int alvoId, float peso)
+void Grafo::inserirAresta(int fonteId, int alvoId, int peso)
 {
     No *noFonte = getNo(fonteId);
     noFonte->inserirAresta(alvoId, peso);
@@ -172,7 +172,7 @@ void Grafo::removeNo(int id)
     }
 }
 
-float Grafo::verificaPesoAresta(int fonteId, int alvoId)
+int Grafo::verificaPesoAresta(int fonteId, int alvoId)
 {
     No *primeiro = this->listaNo.front();
     No *no = getNo(fonteId);

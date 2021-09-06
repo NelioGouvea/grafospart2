@@ -27,7 +27,7 @@ public:
     ~No();
 
     //gets
-    float getPeso();
+    int getPeso();
     int getId();
     float getX();
     float getY();
@@ -39,14 +39,14 @@ public:
     int getGrauSaida();
 
     //sets
-    void setPeso(float peso);
+    void setPeso(int peso);
     void setId(int id);
     void setX(float x);
     void setY(float y);
     void setCoordenadas(float x, float y);
     void setNosAdjacentes(list<No *> nos);
 
-    void inserirAresta(int alvoId, float peso);
+    void inserirAresta(int alvoId, int peso);
     void inserirAresta(int alvoId);
     void removerAresta(int alvoId);
 

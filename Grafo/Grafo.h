@@ -39,14 +39,14 @@ public:
     void auxCaminhamentoProfundidade(No *filho, list<No *> *listaVisitados, Grafo *grafo);
 
     //Setters
-    void inserirNo(int id, float peso);
+    void inserirNo(int id, int peso);
     void inserirNo(int id);
-    void inserirAresta(int fonteId, int alvoId, float peso);
+    void inserirAresta(int fonteId, int alvoId, int peso);
     void inserirAresta(int fonteId, int alvoId);
     //Methods
     void removeNo(int id);
     bool procuraNo(int id);
-    float verificaPesoAresta(int fonteId, int alvoId);
+    int verificaPesoAresta(int fonteId, int alvoId);
 
     void criaListaAdjacencia();
     void imprimeListaAdjacencia();

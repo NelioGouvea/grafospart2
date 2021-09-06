@@ -23,7 +23,7 @@
 using namespace std;
 
 //função auxiliar para calcular peso das arestas 
-float calculaPeso(float x1, float y1, float x2, float y2)
+int calculaPeso(float x1, float y1, float x2, float y2)
 {
     float valF = sqrt( (x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) );
     int valL = (int) valF;
@@ -55,6 +55,7 @@ Grafo *leituraMST(ifstream &input_file)
 
     No *no1;
     No *no2;
+    //adicionando aresta de um no para os demais
     for(int i=1; i<=ordem; i++){
         for(int j= i+1; j<=ordem; j++){
             no1 = graph->getNo(i);

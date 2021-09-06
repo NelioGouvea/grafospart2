@@ -15,19 +15,19 @@ class Aresta
 private:
     int alvoId;
     int fonteId;
-    float peso;
+    int peso;
 
 public:
     // Constructor
-    Aresta(int alvoId, int fonteId, float peso);
+    Aresta(int alvoId, int fonteId, int peso);
     // Destructor
     ~Aresta();
     // Getters
     int getAlvoId();
     int getFonteId();
-    float getPeso();
+    int getPeso();
     // Setters
-    void setPeso(float peso);
+    void setPeso(int peso);
     bool operator==(const Aresta &s) const { return alvoId == s.alvoId; }
     bool operator!=(const Aresta &s) const { return !operator==(s); }
 

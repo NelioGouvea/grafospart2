@@ -8,7 +8,7 @@ using namespace std;
 **************************************************************************************************/
 
 // Constructor
-Aresta::Aresta(int alvoId, int fonteId, float peso)
+Aresta::Aresta(int alvoId, int fonteId, int peso)
 {
 
     this->alvoId = alvoId;
@@ -32,14 +32,14 @@ int Aresta::getFonteId()
 
     return this->fonteId;
 }
-float Aresta::getPeso()
+int Aresta::getPeso()
 {
 
     return this->peso;
 }
 
 // Setters
-void Aresta::setPeso(float peso)
+void Aresta::setPeso(int peso)
 {
 
     this->peso = peso;
