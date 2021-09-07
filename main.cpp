@@ -423,7 +423,8 @@ void selecionar(int selecao, Grafo *graph, ofstream &output_file)
     }
     case 9:
     {
-        Grafo *arvore = gulosoRandomizado(graph, 3);
+        Grafo *arvore = new Grafo(0, false, false, false);
+        gulosoRandomizado(graph, 3, 0.1, 3);
         preencheDot(output_file, arvore, "dcMST");
         break;
     }
