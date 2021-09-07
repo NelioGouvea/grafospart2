@@ -55,7 +55,9 @@ void ordenaVetorArestas(Grafo *grafo, list<Aresta*> *todasArestas) {
     }
 }
 
-void guloso(Grafo *grafo, int d) {
+Grafo* guloso(Grafo *grafo, int d, int *peso, double *tempo) {
+	clock_t t = clock();
+	
 	list<Aresta*> todasArestas;
 
 	ordenaVetorArestas(grafo, &todasArestas);
@@ -81,22 +83,13 @@ void guloso(Grafo *grafo, int d) {
 	}
 
 	s->criaListaAdjacencia();
-	list<No*> lista = s->getListaNos();
 
-	for(auto a = lista.begin(); a != lista.end(); a++) {
-	cout << (*a)->getId() << " || ";
+	*peso = calculaPeso(s);
+	
+	t = clock() - t;
+	*tempo = t / (double) CLOCKS_PER_SEC;
 
-		list<No*> listaAdj = (*a)->getNosAdjacentes();
-		for(auto b = listaAdj.begin(); b != listaAdj.end(); b++)
-			cout << (*b)->getId() <<  " - peso " << (*a)->getAresta((*b)->getId())->getPeso() << " - ";
-		cout << endl;
-	}
-	cout << endl;
-
-	int peso = calculaPeso(s);
-	cout << "Peso total = " << peso << endl;
-
-	execute_falha_segmentacao();
+	return s;
 }
 
 #endif // GULOSO_H_INCLUDED

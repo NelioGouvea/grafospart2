@@ -14,50 +14,19 @@
 
 #include "../Algoritmos/Kruskal.h"
 #include "../Algoritmos/dcMST.h"
+#include "../Algoritmos/guloso.h"
 
 #define INFINITO 9999999
 
 using namespace std;
 
-void ordenaVetorArestas(Grafo *grafo, list<Aresta*> *todasArestas) {
-	map<int, bool> visitado;
-
-	list<No*> listaNos = grafo->getListaNos();
-	for(auto no = listaNos.begin(); no != listaNos.end(); no++)
-		visitado[(*no)->getId()] = false;
-
-	for(auto no = listaNos.begin(); no != listaNos.end(); no++) {
-		
-		list<Aresta*> listaAresta = (*no)->getListaAresta();
-		for(auto aresta = listaAresta.begin(); aresta != listaAresta.end(); aresta++) {
-			if(visitado[(*aresta)->getAlvoId()] == false)
-				todasArestas->push_back((*aresta));
-		}
-
-		visitado[(*no)->getId()] = true;
-	}
-
-	Aresta **vet = new Aresta *[todasArestas->size()];
-
-	int i = 0;
-	for(auto aresta = todasArestas->begin(); aresta != todasArestas->end(); aresta++) {
-		vet[i] = (*aresta);
-		i++;
-	}
-
-	quickSort(vet, 0, i);
-
-	for (int j = 0; j < i; j++) {
-        todasArestas->pop_front();
-        todasArestas->push_back(vet[j]);
-    }
-}
-
 int randomRange(int menor, int maior) {
        return rand()%(maior-menor+1) + menor;
 }
 
-void gulosoRandomizado(Grafo *grafo, int d, float alfa, int numIteracoes) {
+Grafo* gulosoRandomizado(Grafo *grafo, int d, float alfa, int numIteracoes, int *peso, double *tempo) {
+	clock_t t = clock();
+	
 	list<Aresta*> todasArestas;
 
 	ordenaVetorArestas(grafo, &todasArestas);
@@ -103,7 +72,6 @@ void gulosoRandomizado(Grafo *grafo, int d, float alfa, int numIteracoes) {
 		} while(cont < grafo->getOrdem() - 1);
 
 		s->criaListaAdjacencia();
-		cout << "Peso = " << calculaPeso(s) << endl;
 
 		if(solBest == nullptr)
 			solBest = s;
@@ -118,22 +86,13 @@ void gulosoRandomizado(Grafo *grafo, int d, float alfa, int numIteracoes) {
 	}
 
 	solBest->criaListaAdjacencia();
-	list<No*> lista = solBest->getListaNos();
 
-	// for(auto a = lista.begin(); a != lista.end(); a++) {
-	// cout << (*a)->getId() << " || ";
+	*peso = calculaPeso(solBest);
 
-	// 	list<No*> listaAdj = (*a)->getNosAdjacentes();
-	// 	for(auto b = listaAdj.begin(); b != listaAdj.end(); b++)
-	// 		cout << (*b)->getId() <<  " - peso " << (*a)->getAresta((*b)->getId())->getPeso() << " - ";
-	// 	cout << endl;
-	// }
-	// cout << endl;
+	t = clock() - t;
+	*tempo = t / (double) CLOCKS_PER_SEC;
 
-	int peso = calculaPeso(solBest);
-	cout << "Peso total = " << peso << endl;
-
-	execute_falha_segmentacao();
+	return solBest;
 }
 
 #endif // GULOSORANDOMIZADO_H_INCLUDED

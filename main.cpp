@@ -18,6 +18,7 @@
 #include "Algoritmos/PinkFloyd.h"
 #include "Algoritmos/Prim.h"
 #include "Algoritmos/gulosoRanzomizado.h"
+#include "Algoritmos/guloso.h"
 #include <string>
 
 using namespace std;
@@ -185,7 +186,8 @@ int menu()
     cout << "[6] Arvore Geradora Minima de Kruskal" << endl;
     cout << "[7] Imprimir caminhamento em profundidade" << endl;
     cout << "[8] Imprimir ordenacao topologica" << endl;
-    cout << "[9] dcMST" << endl;
+    cout << "[9] Guloso" << endl;
+    cout << "[10] Guloso randomizado" << endl;
     cout << "[0] Sair" << endl;
 
     cin >> selecao;
@@ -423,9 +425,24 @@ void selecionar(int selecao, Grafo *graph, ofstream &output_file)
     }
     case 9:
     {
-        Grafo *arvore = new Grafo(0, false, false, false);
-        gulosoRandomizado(graph, 3, 0.1, 3);
-        preencheDot(output_file, arvore, "dcMST");
+        double tempo;
+        int peso;
+        Grafo *arvore = guloso(graph, 3, &peso, &tempo);
+        preencheDot(output_file, arvore, "guloso");
+        output_file << endl;
+        output_file << "Peso total = " << peso << endl;
+        output_file << "Tempo total = " << tempo << " s" << endl;
+        break;
+    }
+    case 10:
+    {
+        double tempo;
+        int peso;
+        Grafo *arvore = gulosoRandomizado(graph, 3, 0.5, 3, &peso, &tempo);
+        preencheDot(output_file, arvore, "gulosoRandomizado");
+        output_file << endl;
+        output_file << "Peso total = " << peso << endl;
+        output_file << "Tempo total = " << tempo << " s" << endl;
         break;
     }
     default:
