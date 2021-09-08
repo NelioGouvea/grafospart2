@@ -4,6 +4,8 @@
 #include "../Grafo/Grafo.h"
 #include "../Grafo/No.h"
 #include "../Grafo/Aresta.h"
+#include "../Algoritmos/FechoDireto.h"
+#include "../Algoritmos/FechoIndireto.h"
 
 #include <list>
 #include <map>
@@ -14,7 +16,6 @@
 
 using namespace std;
 
-#include "../Algoritmos/Kruskal.h"
 #include "../Algoritmos/dcMST.h"
 
 #define INFINITO 9999999

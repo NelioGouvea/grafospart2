@@ -4,8 +4,7 @@
 #include "../Grafo/Grafo.h"
 #include "../Grafo/No.h"
 #include "../Grafo/Aresta.h"
-
-#include "Dijkstra.h"
+#include "../Algoritmos/dcMST.h"
 
 #include <list>
 

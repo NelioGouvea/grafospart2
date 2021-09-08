@@ -20,6 +20,14 @@ void execute_falha_segmentacao()
 	int test = *ponteiroperigoso;
 }
 
+// funcao auxiliar que verifica se um no esta contido numa lista
+bool contemNo(list<No*> listaNo, No *noAlvo) {
+    list<No*>::iterator noAtual;
+    for(noAtual = listaNo.begin(); noAtual != listaNo.end(); noAtual++)
+        if((*noAtual) == noAlvo)
+            return true;
+    return false;                   
+}
 
 // funcao auxiliar que ordena um vetor de nohs
 // a ordenacao comparada pelo peso da aresta entre os nohs no vetor e um noh de referencia
@@ -51,6 +59,46 @@ void quickSort(No **vet, No *noReferencia, int p, int q) {
     if (i < q)
     {
         quickSort(vet, noReferencia, i, q);
+    }
+}
+
+// funcao para comparar e ordenar as arestas por peso
+void quickSort(Aresta **vet, int p, int q)
+{
+
+    float pivo = vet[(int)((p + q) / 2)]->getPeso();
+    int i = p;
+    int j = q - 1;
+
+    while (i <= j)
+    {
+        while (vet[i]->getPeso() < pivo)
+        {
+            i++;
+        }
+
+        while (vet[j]->getPeso() > pivo)
+        {
+            j--;
+        }
+
+        if (i <= j)
+        {
+            Aresta *aresta;
+            aresta = vet[i];
+            vet[i] = vet[j];
+            vet[j] = aresta;
+            i++;
+            j--;
+        }
+    }
+
+    if (p < j)
+        quickSort(vet, p, j + 1);
+
+    if (i < q)
+    {
+        quickSort(vet, i, q);
     }
 }
 

@@ -4,8 +4,10 @@
 #include "../Grafo/Grafo.h"
 #include "../Grafo/No.h"
 #include "../Grafo/Aresta.h"
+#include "../Algoritmos/dcMST.h"
 #include <iostream>
 #include <stdlib.h>
+
 
 //preenche a lista de nós visitados
 void auxFechoDireto(Grafo *grafo, No *noAtual, list<No *> *visitados)

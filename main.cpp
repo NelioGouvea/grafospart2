@@ -11,6 +11,8 @@
 #include "Grafo/No.h"
 #include "Grafo/Aresta.h"
 #include "Algoritmos/guloso.h"
+#include "Algoritmos/gulosoRandomizado.h"
+#include "Algoritmos/gulosoRandomizadoReativo.h"
 #include <string>
 
 using namespace std;
@@ -161,17 +163,24 @@ void selecionar(int selecao, Grafo *graph, ofstream &output_file)
         output_file << "Tempo total = " << tempo << " s" << endl;
         break;
     }
-    // case 3:
-    // {
-    //     double tempo;
-    //     int peso;
-    //     Grafo *arvore = gulosoRandomizado(graph, 3, 0.5, 3, &peso, &tempo);
-    //     preencheDot(output_file, arvore, "gulosoRandomizado");
-    //     output_file << endl;
-    //     output_file << "Peso total = " << peso << endl;
-    //     output_file << "Tempo total = " << tempo << " s" << endl;
-    //     break;
-    // }
+    case 3:
+    {
+        double tempo;
+        int peso;
+        int tam = 10;
+        float *alfas = new float[tam];
+        for (size_t i = 0; i < tam; i++)
+        {
+            alfas[i] = i/tam ;
+        } 
+
+        Grafo *arvore = gulosoRandomizadoReativo(graph,  3, alfas, tam, 3, &peso, &tempo, 1);
+        preencheDot(output_file, arvore, "gulosoRandomizado");
+        output_file << endl;
+        output_file << "Peso total = " << peso << endl;
+        output_file << "Tempo total = " << tempo << " s" << endl;
+        break;
+    }
     default:
     {
         cout << " Error!!! invalid option!!" << endl;

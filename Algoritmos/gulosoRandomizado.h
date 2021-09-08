@@ -4,6 +4,8 @@
 #include "../Grafo/Grafo.h"
 #include "../Grafo/No.h"
 #include "../Grafo/Aresta.h"
+#include "../Algoritmos/FechoDireto.h"
+#include "../Algoritmos/FechoIndireto.h"
 
 #include <list>
 #include <map>
@@ -12,7 +14,6 @@
 
 #include <iostream>
 
-#include "../Algoritmos/Kruskal.h"
 #include "../Algoritmos/dcMST.h"
 #include "../Algoritmos/guloso.h"
 

@@ -4,14 +4,13 @@
 #include "../Grafo/Grafo.h"
 #include "../Grafo/No.h"
 #include "../Grafo/Aresta.h"
-
-#include "Dijkstra.h"
-
+#include "../Algoritmos/dcMST.h"
 #include <list>
 
 #include <iostream>
 
 using namespace std;
+
 
 // funcao auxiliar que acha os nos ascendentes
 void achaNosAscendentes(No* noAlvo, list<No*> *fecho, list<No*> listaNos) {

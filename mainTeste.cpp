@@ -3,13 +3,8 @@
 #include "Grafo/Grafo.h"
 #include "Grafo/No.h"
 #include "Grafo/Aresta.h"
-#include "Algoritmos/Dijkstra.h"
 #include "Algoritmos/FechoDireto.h"
-#include "Algoritmos/FechoIndireto.h"
-#include "Algoritmos/Kruskal.h"
 #include "Algoritmos/OrdenacaoTopologica.h"
-#include "Algoritmos/PinkFloyd.h"
-#include "Algoritmos/Prim.h"
 #include "Algoritmos/dcMST.h"
 
 using namespace std;
