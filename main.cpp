@@ -10,14 +10,6 @@
 #include "Grafo/Grafo.h"
 #include "Grafo/No.h"
 #include "Grafo/Aresta.h"
-#include "Algoritmos/Dijkstra.h"
-#include "Algoritmos/FechoDireto.h"
-#include "Algoritmos/FechoIndireto.h"
-#include "Algoritmos/Kruskal.h"
-#include "Algoritmos/OrdenacaoTopologica.h"
-#include "Algoritmos/PinkFloyd.h"
-#include "Algoritmos/Prim.h"
-#include "Algoritmos/gulosoRanzomizado.h"
 #include "Algoritmos/guloso.h"
 #include <string>
 
@@ -70,106 +62,6 @@ Grafo *leituraMST(ifstream &input_file)
     return graph;
 }
 
-Grafo *leitura(ifstream &input_file, int directed, int weightedEdge, int weightedNode)
-{
-
-    //Variáveis para auxiliar na criação dos nós no Grafo
-    int idNodeSource;
-    int idNodeTarget;
-    int order;
-
-    //Pegando a ordem do grafo
-    input_file >> order;
-
-    //Criando objeto grafo
-    Grafo *graph = new Grafo(order, directed, weightedEdge, weightedNode);
-
-    //Leitura de arquivo
-
-    if (!graph->getPonderadoAresta() && !graph->getPonderadoNo())
-    {
-
-        while (input_file >> idNodeSource >> idNodeTarget)
-        {
-
-            graph->inserirAresta(idNodeSource, idNodeTarget, 0);
-        }
-    }
-    else if (graph->getPonderadoAresta() && !graph->getPonderadoNo())
-    {
-
-        float edgeWeight;
-
-        while (input_file >> idNodeSource >> idNodeTarget >> edgeWeight)
-        {
-
-            graph->inserirAresta(idNodeSource, idNodeTarget, edgeWeight);
-        }
-    }
-    else if (graph->getPonderadoNo() && !graph->getPonderadoAresta())
-    {
-
-        float nodeSourceWeight, nodeTargetWeight;
-
-        while (input_file >> idNodeSource >> nodeSourceWeight >> idNodeTarget >> nodeTargetWeight)
-        {
-
-            graph->inserirAresta(idNodeSource, idNodeTarget, 0);
-            graph->getNo(idNodeSource)->setPeso(nodeSourceWeight);
-            graph->getNo(idNodeTarget)->setPeso(nodeTargetWeight);
-        }
-    }
-    else if (graph->getPonderadoNo() && graph->getPonderadoAresta())
-    {
-
-        float nodeSourceWeight, nodeTargetWeight, edgeWeight;
-
-        while (input_file >> idNodeSource >> nodeSourceWeight >> idNodeTarget >> nodeTargetWeight)
-        {
-
-            graph->inserirAresta(idNodeSource, idNodeTarget, edgeWeight);
-            graph->getNo(idNodeSource)->setPeso(nodeSourceWeight);
-            graph->getNo(idNodeTarget)->setPeso(nodeTargetWeight);
-        }
-    }
-
-    graph->criaListaAdjacencia();
-
-    return graph;
-}
-
-Grafo *leituraInstancia(ifstream &input_file, int directed, int weightedEdge, int weightedNode)
-{
-
-    //Variáveis para auxiliar na criação dos nós no Grafo
-    cout << "criando variavei de auxilio " << endl;
-    int idNodeSource;
-    int idNodeTarget;
-    int order;
-    int numEdges;
-
-    //Pegando a ordem do grafo
-    cout << "pegando ordem do grafo " << endl;
-    input_file >> order >> numEdges;
-
-    //Criando objeto grafo
-    cout << "criando objeto de grafo " << endl;
-    Grafo *graph = new Grafo(order, directed, weightedEdge, weightedNode);
-
-    //Leitura de arquivo
-    cout << "fazendo leitura do arquivo " << endl;
-    while (input_file >> idNodeSource >> idNodeTarget)
-    {
-
-        graph->inserirAresta(idNodeSource, idNodeTarget, 0);
-    }
-
-    cout << "voltando para main " << endl;
-
-    graph->criaListaAdjacencia();
-
-    return graph;
-}
 
 int menu()
 {
@@ -178,16 +70,9 @@ int menu()
 
     cout << "MENU" << endl;
     cout << "----" << endl;
-    cout << "[1] Fecho Transitivo Direto" << endl;
-    cout << "[2] Fecho Transitivo Indireto" << endl;
-    cout << "[3] Caminho Minimo entre dois vertices - Dijkstra" << endl;
-    cout << "[4] Caminho Minimo entre dois vertices - Floyd" << endl;
-    cout << "[5] Arvore Geradora Minima de Prim" << endl;
-    cout << "[6] Arvore Geradora Minima de Kruskal" << endl;
-    cout << "[7] Imprimir caminhamento em profundidade" << endl;
-    cout << "[8] Imprimir ordenacao topologica" << endl;
-    cout << "[9] Guloso" << endl;
-    cout << "[10] Guloso randomizado" << endl;
+    cout << "[1] Guloso" << endl;
+    cout << "[2] Guloso randomizado" << endl;
+    cout << "[3] Guloso randomizado reativo" << endl;
     cout << "[0] Sair" << endl;
 
     cin >> selecao;
@@ -253,177 +138,8 @@ void selecionar(int selecao, Grafo *graph, ofstream &output_file)
 
     switch (selecao)
     {
-
-    //Fecho Transitivo Direto
+   
     case 1:
-    {
-        if (graph->getDirecionado())
-        {
-            int id;
-            cout << "Digite o Identificador do vertice: " << endl;
-            cin >> id;
-            Grafo *novo = fechoDireto(graph, id);
-            preencheFechos(output_file, novo, "Direto");
-            break;
-        }
-        else
-        {
-            cout << "ERRO: Grafo invalido, tente usar um grafo direcionado" << endl;
-        }
-        break;
-    }
-    //Fecho Transitivo Indireto usando um Grafo Direcionado
-    case 2:
-    {
-        if (graph->getDirecionado())
-        {
-            int id;
-            cout << "Digite o Identificador do vertice: " << endl;
-            cin >> id;
-            Grafo *novo = FechoIndireto(graph, id);
-            preencheFechos(output_file, novo, "Indireto");
-        }
-        else
-        {
-            cout << "ERRO: Grafo invalido, tente usar um grafo direcionado" << endl;
-        }
-        break;
-    }
-
-        //Caminho mínimo entre dois vértices usando Djkstra;
-    case 3:
-    {
-        int id1, id2;
-        cout << "Digite o Identificador do primeiro vertice: " << endl;
-        cin >> id1;
-        cout << "Digite o Identificador do segundo vertice: " << endl;
-        cin >> id2;
-
-        float caminho = Dijkstra(graph, id1, id2);
-
-        if (caminho == 9999999)
-        {
-            cout << "Sem caminho direto entre os nos " << id1 << " e " << id2 << endl;
-            output_file << "Sem caminho direto entre os nos " << id1 << " e " << id2 << endl;
-        }
-
-        else
-        {
-            cout << "Caminho entre os nos " << id1 << " e " << id2 << " : " << caminho << endl;
-            output_file << "Caminho entre os nos " << id1 << " e " << id2 << " : " << caminho << endl;
-        }
-        break;
-    }
-
-        //Caminho mínimo entre dois vértices usando Floyd;
-    case 4:
-    {
-
-        int id1, id2;
-        cout << "Digite o Identificador do primeiro vertice: " << endl;
-        cin >> id1;
-        cout << "Digite o Identificador do segundo vertice: " << endl;
-        cin >> id2;
-
-        float custo = custoPinkFloyd(graph, id1, id2);
-        if (custo == -99999)
-        {
-            cout << "Sem caminho direto entre os nos " << id1 << " e " << id2 << endl;
-            output_file << "Sem caminho direto entre os nos " << id1 << " e " << id2 << endl;
-        }
-
-        else
-        {
-            cout << "Caminho entre os nos " << id1 << " e " << id2 << " : " << custo << endl;
-            output_file << "Caminho entre os nos " << id1 << " e " << id2 << " : " << custo << endl;
-        }
-
-        break;
-    }
-
-        //AGM Prim;
-    case 5:
-    {
-        if (!graph->getDirecionado())
-        {
-            list<int> subconjunto;
-            int id = 0;
-            int cont = 1;
-            cout << "Digite os identificadores para adicionar ao subconjunto, ao termino digite -1 para finalizar as insercoes" << endl;
-            while (id != -1)
-            {
-
-                cout << "Digite o elemento " << cont << " : ";
-                cin >> id;
-                if (id != -1)
-                {
-                    subconjunto.push_back(id);
-                }
-
-                cont++;
-            }
-            cout << endl;
-
-            cout << "Entrando em PRIM" << endl;
-            Grafo *arvore = Prim(graph, subconjunto);
-            preencheDot(output_file, arvore, "Prim");
-        }
-        else
-        {
-            cout << "ERRO: Grafo invalido, tente usar um grafo direcionado" << endl;
-        }
-
-        break;
-    }
-
-        //AGM Kruskal;
-    case 6:
-    {
-        list<int> subconjunto;
-        int id = 0;
-        int cont = 1;
-        cout << "Digite os identificadores para adicionar ao subconjunto, ao termino digite -1 para finalizar as insercoes" << endl;
-        while (id != -1)
-        {
-
-            cout << "Digite o elemento " << cont << " : ";
-            cin >> id;
-            subconjunto.push_back(id);
-            cont++;
-        }
-        cout << endl;
-        int *subconjuntoVet = new int[subconjunto.size()];
-
-        int i = 0;
-        list<int>::iterator it;
-        for (it = subconjunto.begin(); it != subconjunto.end(); it++)
-        {
-            subconjuntoVet[i] = (*it);
-            i++;
-        }
-
-        Grafo *arvore = kruskal(graph, subconjuntoVet, i - 1);
-        preencheDot(output_file, arvore, "Kruskal");
-        break;
-    }
-    //Caminhamento em Profundidade
-    case 7:
-    {
-        int id;
-        cout << "Digite o Identificador do vertice: " << endl;
-        cin >> id;
-
-        Grafo *arvore = graph->caminhamentoProfundidade(id);
-        preencheFechos(output_file, arvore, "Caminhamento");
-        break;
-    }
-    //Ordenação Topologica;
-    case 8:
-    {
-        OrdenacaoTopologica(graph);
-        break;
-    }
-    case 9:
     {
         double tempo;
         int peso;
@@ -434,7 +150,7 @@ void selecionar(int selecao, Grafo *graph, ofstream &output_file)
         output_file << "Tempo total = " << tempo << " s" << endl;
         break;
     }
-    case 10:
+    case 2:
     {
         double tempo;
         int peso;
@@ -445,6 +161,17 @@ void selecionar(int selecao, Grafo *graph, ofstream &output_file)
         output_file << "Tempo total = " << tempo << " s" << endl;
         break;
     }
+    // case 3:
+    // {
+    //     double tempo;
+    //     int peso;
+    //     Grafo *arvore = gulosoRandomizado(graph, 3, 0.5, 3, &peso, &tempo);
+    //     preencheDot(output_file, arvore, "gulosoRandomizado");
+    //     output_file << endl;
+    //     output_file << "Peso total = " << peso << endl;
+    //     output_file << "Tempo total = " << tempo << " s" << endl;
+    //     break;
+    // }
     default:
     {
         cout << " Error!!! invalid option!!" << endl;
