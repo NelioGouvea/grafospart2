@@ -49,6 +49,19 @@ int Grafo::getOrdem()
 
     return this->ordem;
 }
+void Grafo::geraVetNo()
+{
+    
+    this->vetNo = new No*[this->ordem+1];
+     
+    list<No *>::iterator itLista;
+    for (itLista = this->listaNo.begin(); itLista != this->listaNo.end(); itLista++)
+    {
+      this->vetNo[((*itLista)->getId())] = (*itLista);
+    }
+     
+}
+
 
 // OK
 int Grafo::getNumeroArestas()
@@ -112,6 +125,16 @@ No *Grafo::getNo(int id)
     return nullptr;
 }
 
+No *Grafo::getNoVet(int id)
+{
+   
+    if(this->ordem >= id){
+        return this->vetNo[id];
+    }
+
+    return nullptr;
+}
+
 list<No *> Grafo::getListaNos()
 {
     return this->listaNo;
@@ -147,6 +170,17 @@ void Grafo::inserirAresta(int fonteId, int alvoId)
 bool Grafo::procuraNo(int id)
 {
     if (getNo(id) != nullptr)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+bool Grafo::procuraNoVet(int id)
+{
+    if (getNoVet(id) != nullptr)
     {
         return true;
     }
@@ -221,13 +255,14 @@ void Grafo::imprimeListaAdjacencia()
             cout << (*noAdjacente)->getId() << " ";
         cout << endl;
     }
-    cout << endl << endl;
+    cout << endl
+         << endl;
 }
 
 //Funcao para retornar a arvore dada pelo caminhamento em profundidade a partir de dado no parametro
 Grafo *Grafo::caminhamentoProfundidade(int id)
 {
-    //Inizializo o no como sendo o nó parametro 
+    //Inizializo o no como sendo o nó parametro
     No *no = this->getNo(id);
     //Lista para armazenar nós visitados
     list<No *> listaVisitados;
@@ -285,7 +320,7 @@ void Grafo::auxCaminhamentoProfundidade(No *filho, list<No *> *listaVisitados, G
     }
 }
 
-// funcao para verificar se um no ja foi visitado 
+// funcao para verificar se um no ja foi visitado
 bool Grafo::verificaVisita(No *no, list<No *> listaVisitados)
 {
     list<No *>::iterator noIterator;
@@ -298,7 +333,18 @@ bool Grafo::verificaVisita(No *no, list<No *> listaVisitados)
     return true;
 }
 
-void Grafo::arrumaVisitado() {
-    for(auto noAtual = listaNo.begin(); noAtual != listaNo.end(); noAtual++)
+bool Grafo::verificaVisitaVet(No *no, No** listaVisitados)
+{
+
+    if(listaVisitados[no->getId()] != nullptr){
+        return false;
+    }
+    
+    return true;
+}
+
+void Grafo::arrumaVisitado()
+{
+    for (auto noAtual = listaNo.begin(); noAtual != listaNo.end(); noAtual++)
         (*noAtual)->setVisitado(false);
 }

@@ -20,6 +20,7 @@ private:
     bool ponderadoNo;
     list<No *> listaNo;
     list<list<No *>> listaAdjacencia;
+    No ** vetNo;
 
 public:
     //Constructor
@@ -33,6 +34,10 @@ public:
     bool getPonderadoAresta();
     bool getPonderadoNo();
     No *getNo(int id);
+    No *getNoVet(int id);
+    bool procuraNoVet(int id);
+    bool verificaVisitaVet(No *no, No** listaVisitados);
+    void geraVetNo();
     list<No *> getListaNos();
     list<list<No *>> getListaAdjacencia();
     Grafo *caminhamentoProfundidade(int id);
@@ -47,7 +52,7 @@ public:
     void removeNo(int id);
     bool procuraNo(int id);
     int verificaPesoAresta(int fonteId, int alvoId);
-
+    
     void criaListaAdjacencia();
     void imprimeListaAdjacencia();
     bool verificaVisita(No *no, list<No *> listaVisitados);

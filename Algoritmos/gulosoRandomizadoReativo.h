@@ -140,12 +140,14 @@ Grafo *gulosoRandomizadoReativo(Grafo *grafo, int d, float *alfas, int tamAlfa, 
     inicializaVetores(probAlfas, pesoMed, *peso, tamAlfa);
     while (i < numIteracoes)
     {
+        
         if (i % bloco == 0)
             atualizaProbabilidade(probAlfas, q, pesoMed, peso, tamAlfa);
 
         i++;
         s = new Grafo(grafo->getOrdem(), false, true, false);
-
+        s->geraVetNo();
+          
         int cont = 0;
         alfa = escolheAlfa(probAlfas, tamAlfa);
         do
@@ -165,8 +167,8 @@ Grafo *gulosoRandomizadoReativo(Grafo *grafo, int d, float *alfas, int tamAlfa, 
                 j++;
             }
 
-            No *noFonte = s->getNo(random->getFonteId());
-            No *noAlvo = s->getNo(random->getAlvoId());
+            No *noFonte = s->getNoVet(random->getFonteId());
+            No *noAlvo = s->getNoVet(random->getAlvoId());
 
             s->criaListaAdjacencia();
 
@@ -182,7 +184,7 @@ Grafo *gulosoRandomizadoReativo(Grafo *grafo, int d, float *alfas, int tamAlfa, 
             todasArestas.remove(random);
 
         } while (cont < grafo->getOrdem() - 1);
-
+      
         s->criaListaAdjacencia();
 
         if (solBest == nullptr)
@@ -196,6 +198,7 @@ Grafo *gulosoRandomizadoReativo(Grafo *grafo, int d, float *alfas, int tamAlfa, 
             if (pesoS < pesoSolBest)
                 solBest = s;
         }
+          
         atualizaMedias(pesoMed, tamAlfa, alphaIndex, pesoS, bloco);
     }
 

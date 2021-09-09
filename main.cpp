@@ -17,18 +17,17 @@
 
 using namespace std;
 
-//função auxiliar para calcular peso das arestas 
+//função auxiliar para calcular peso das arestas
 int calculaPeso(float x1, float y1, float x2, float y2)
 {
-    float valF = sqrt( (x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) );
-    int valL = (int) valF;
-    float valR = valF - valL;   
+    float valF = sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+    int valL = (int)valF;
+    float valR = valF - valL;
 
-    if(valR >= 0.5)
+    if (valR >= 0.5)
         return valL + 1;
     return valL;
 }
-
 
 Grafo *leituraMST(ifstream &input_file)
 {
@@ -38,32 +37,35 @@ Grafo *leituraMST(ifstream &input_file)
     float x, y;
 
     //Pegando a ordem do grafo
-    input_file >> ordem;    
+    input_file >> ordem;
 
     //Criando objeto grafo
     Grafo *graph = new Grafo(ordem, 0, 1, 0);
-
+    graph->geraVetNo();
     while (input_file >> id >> x >> y)
     {
-        graph->getNo(id)->setCoordenadas(x,y);
+
+        graph->getNoVet(id)->setCoordenadas(x, y);
     }
 
     No *no1;
     No *no2;
     //adicionando aresta de um no para os demais
-    for(int i=1; i<=ordem; i++){
-        for(int j= i+1; j<=ordem; j++){
-            no1 = graph->getNo(i);
-            no2 = graph->getNo(j);
-            graph->inserirAresta(i,j,calculaPeso(no1->getX(), no1->getY(), no2->getX(), no2->getY()));
+    
+    for (int i = 1; i <= ordem; i++)
+    {
+        for (int j = i + 1; j <= ordem; j++)
+        {
+            no1 = graph->getNoVet(i);
+            no2 = graph->getNoVet(j);
+            graph->inserirAresta(i, j, calculaPeso(no1->getX(), no1->getY(), no2->getX(), no2->getY()));
         }
     }
-
+   
     graph->criaListaAdjacencia();
 
     return graph;
 }
-
 
 int menu()
 {
@@ -140,7 +142,7 @@ void selecionar(int selecao, Grafo *graph, ofstream &output_file)
 
     switch (selecao)
     {
-   
+
     case 1:
     {
         double tempo;
@@ -171,10 +173,10 @@ void selecionar(int selecao, Grafo *graph, ofstream &output_file)
         float *alfas = new float[tam];
         for (size_t i = 0; i < tam; i++)
         {
-            alfas[i] = i/tam ;
-        } 
+            alfas[i] = i / tam;
+        }
 
-        Grafo *arvore = gulosoRandomizadoReativo(graph,  3, alfas, tam, 3, &peso, &tempo, 1);
+        Grafo *arvore = gulosoRandomizadoReativo(graph, 3, alfas, tam, 3, &peso, &tempo, 1);
         preencheDot(output_file, arvore, "gulosoRandomizado");
         output_file << endl;
         output_file << "Peso total = " << peso << endl;

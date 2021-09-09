@@ -38,8 +38,8 @@ void auxFechoDireto(Grafo *grafo, No *noAtual, list<No *> *visitados)
 //Retorna um novo grafo sem aresta com todos os nós que o vértice idAlvo alcança dentro do grafo enviado
 Grafo* fechoDireto(Grafo *grafo, int idAlvo)
 {
-    
-    No *no = grafo->getNo(idAlvo);
+   
+    No *no = grafo->getNoVet(idAlvo);
     list<No *> visitados;
     Grafo* fechoDireto = new Grafo(0, false, false, false);
     auxFechoDireto(grafo, no, &visitados);
