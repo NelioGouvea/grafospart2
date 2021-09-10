@@ -29,18 +29,15 @@ Grafo::Grafo(int ordem, bool direcionado, bool ponderadoAresta, bool ponderadoNo
 Grafo::~Grafo()
 {
 
-    // No *proximoNo = this->primeiroNo;
+    No *proximoNo;
 
-    // while (proximoNo != nullptr)
-    // {
 
-    //     proximoNo->removeAllEdges();
-    //     No *auxNo = proximoNo->getNextNode();
-    //     delete proximoNo;
-    //     proximoNo = auxNo;
-    // }
-
-    this->listaNo.clear();
+    list<No *>::iterator itLista;
+    for (itLista = this->listaNo.begin(); itLista != this->listaNo.end(); itLista++)
+    {
+        proximoNo = (*itLista);
+        delete proximoNo;
+    }
 }
 
 // OK
@@ -51,17 +48,15 @@ int Grafo::getOrdem()
 }
 void Grafo::geraVetNo()
 {
-    
-    this->vetNo = new No*[this->ordem+1];
-     
+
+    this->vetNo = new No *[this->ordem + 1];
+
     list<No *>::iterator itLista;
     for (itLista = this->listaNo.begin(); itLista != this->listaNo.end(); itLista++)
     {
-      this->vetNo[((*itLista)->getId())] = (*itLista);
+        this->vetNo[((*itLista)->getId())] = (*itLista);
     }
-     
 }
-
 
 // OK
 int Grafo::getNumeroArestas()
@@ -127,8 +122,9 @@ No *Grafo::getNo(int id)
 
 No *Grafo::getNoVet(int id)
 {
-   
-    if(this->ordem >= id){
+
+    if (this->ordem >= id)
+    {
         return this->vetNo[id];
     }
 
@@ -333,13 +329,14 @@ bool Grafo::verificaVisita(No *no, list<No *> listaVisitados)
     return true;
 }
 
-bool Grafo::verificaVisitaVet(No *no, No** listaVisitados)
+bool Grafo::verificaVisitaVet(No *no, No **listaVisitados)
 {
 
-    if(listaVisitados[no->getId()] != nullptr){
+    if (listaVisitados[no->getId()] != nullptr)
+    {
         return false;
     }
-    
+
     return true;
 }
 

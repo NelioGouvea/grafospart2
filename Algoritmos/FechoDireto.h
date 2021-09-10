@@ -41,7 +41,9 @@ Grafo* fechoDireto(Grafo *grafo, int idAlvo)
    
     No *no = grafo->getNoVet(idAlvo);
     list<No *> visitados;
-    Grafo* fechoDireto = new Grafo(0, false, false, false);
+    //Grafo* fechoDireto = new Grafo(0, false, false, false);
+    Grafo* fechoDireto = (Grafo*)malloc(sizeof(Grafo));
+    new (fechoDireto) Grafo(0, false, false, false);
     auxFechoDireto(grafo, no, &visitados);
     list<No *>::iterator visitadosIt;
     for (visitadosIt = visitados.begin(); visitadosIt != visitados.end(); visitadosIt++)

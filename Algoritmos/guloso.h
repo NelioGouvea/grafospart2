@@ -26,11 +26,12 @@ using namespace std;
 void ordenaVetorArestas(Grafo *grafo, list<Aresta *> *todasArestas)
 {
 	map<int, bool> visitado;
-
+	
 	list<No *> listaNos = grafo->getListaNos();
 	for (auto no = listaNos.begin(); no != listaNos.end(); no++)
 		visitado[(*no)->getId()] = false;
 
+	
 	for (auto no = listaNos.begin(); no != listaNos.end(); no++)
 	{
 
@@ -43,16 +44,18 @@ void ordenaVetorArestas(Grafo *grafo, list<Aresta *> *todasArestas)
 
 		visitado[(*no)->getId()] = true;
 	}
-
+	
 	Aresta **vet = new Aresta *[todasArestas->size()];
+	//Aresta **vet = (Aresta**)malloc(sizeof(todasArestas->size()));
 
 	int i = 0;
-	for (auto aresta = todasArestas->begin(); aresta != todasArestas->end(); aresta++)
+	for (list<Aresta *>::iterator aresta = todasArestas->begin(); aresta != todasArestas->end(); aresta++)
 	{
+		
 		vet[i] = (*aresta);
 		i++;
 	}
-
+	
 	quickSort(vet, 0, i);
 
 	for (int j = 0; j < i; j++)
@@ -60,6 +63,7 @@ void ordenaVetorArestas(Grafo *grafo, list<Aresta *> *todasArestas)
 		todasArestas->pop_front();
 		todasArestas->push_back(vet[j]);
 	}
+		
 }
 
 Grafo *guloso(Grafo *grafo, int d, int *peso, double *tempo)
@@ -109,8 +113,9 @@ Grafo *guloso(Grafo *grafo, int d, int *peso, double *tempo)
 
 		//remove a primeira aresta de menor peso
 		todasArestas.pop_front();
+		
 	}
-	
+
 	s->criaListaAdjacencia();
 
 	//calcula o peso da arvore, ou seja, o somatorio dos pesos de todas as arestas

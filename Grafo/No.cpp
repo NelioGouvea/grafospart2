@@ -32,9 +32,14 @@ No::No()
 
 //Destrutor
 No::~No()
-{
-    this->listaAresta.~list();
-    this->nosAdjacentes.~list();
+{   
+    list<Aresta *>::iterator itLista;
+    list<Aresta *>::iterator auxitList;
+    for (itLista = this->listaAresta.begin(); itLista != this->listaAresta.end(); itLista++)
+    {
+        auxitList = itLista;
+        delete (*auxitList);
+    }
 }
 
 //gets
@@ -180,18 +185,22 @@ void No::incrementaGrauSaida(int val)
     this->grauSaida += val;
 }
 
-int No::getGrau() {
+int No::getGrau()
+{
     return this->grau;
 }
 
-void No::setGrau(int val) {
+void No::setGrau(int val)
+{
     this->grau = val;
 }
 
-bool No::getVisitado() {
+bool No::getVisitado()
+{
     return this->visitado;
 }
 
-void No::setVisitado(bool val) {
+void No::setVisitado(bool val)
+{
     this->visitado = val;
 }

@@ -169,14 +169,15 @@ void selecionar(int selecao, Grafo *graph, ofstream &output_file)
     {
         double tempo;
         int peso;
-        int tam = 10;
-        float *alfas = new float[tam];
-        for (size_t i = 0; i < tam; i++)
+        int tam = 5;
+        //float *alfas = new float[tam];
+        float *alfas = (float*)malloc(sizeof(tam));
+        for (size_t i = 1; i <= tam; i++)
         {
-            alfas[i] = i / tam;
+            alfas[i-1] = i/10;
         }
 
-        Grafo *arvore = gulosoRandomizadoReativo(graph, 3, alfas, tam, 3, &peso, &tempo, 1);
+        Grafo *arvore = gulosoRandomizadoReativo(graph, 3, alfas, tam, 5, &peso, &tempo, 2);
         preencheDot(output_file, arvore, "gulosoRandomizado");
         output_file << endl;
         output_file << "Peso total = " << peso << endl;
