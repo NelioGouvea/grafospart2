@@ -32,6 +32,8 @@ Grafo* gulosoRandomizado(Grafo *grafo, int d, float alfa, int numIteracoes, int 
 
 	ordenaVetorArestas(grafo, &todasArestas);
 
+	list<Aresta*> auxAresta = todasArestas;
+
 	Grafo *s;
 	Grafo *solBest = nullptr;
 
@@ -39,7 +41,7 @@ Grafo* gulosoRandomizado(Grafo *grafo, int d, float alfa, int numIteracoes, int 
 	while(i < numIteracoes) {
 		i++;
 		s = new Grafo(grafo->getOrdem(), false, true, false);
-		
+		s->geraVetNo();
 		int cont = 0;
 		do {
 			srand(time(NULL));
@@ -71,6 +73,8 @@ Grafo* gulosoRandomizado(Grafo *grafo, int d, float alfa, int numIteracoes, int 
 			todasArestas.remove(random);
 
 		} while(cont < grafo->getOrdem() - 1);
+
+		todasArestas = auxAresta;
 
 		s->criaListaAdjacencia();
 
