@@ -149,13 +149,13 @@ bool verAciclico(int id, int alvo, Grafo *agm)
 float calculaPeso(Grafo *arvore)
 {
 
-	cout << "ENTREI calculaPeso" << endl;
+	
 	list<No *> listaNos = arvore->getListaNos();
 	map<int, bool> visitados;
 
 	float total = 0;
 
-	cout << "PRÉ FOR" << endl;
+	
 	for (auto a = listaNos.begin(); a != listaNos.end(); a++)
 	{
 		list<No *> adjacentes = (*a)->getNosAdjacentes();
@@ -167,7 +167,6 @@ float calculaPeso(Grafo *arvore)
 		visitados[(*a)->getId()] = true;
 	}
 
-	cout << "SAINDO calculaPeso" << endl;
 	return total;
 }
 

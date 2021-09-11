@@ -22,7 +22,7 @@
 
 using namespace std;
 
-void quicksort(float *vet, int began, int end)
+void quicksort(double *vet, int began, int end)
 {
     int i, j;
     float pivo, aux;
@@ -54,16 +54,16 @@ void quicksort(float *vet, int began, int end)
         quicksort(vet, i, end);
 }
 
-float escolheAlfa(float *prob, int tam)
+double escolheAlfa(double *prob, int tam)
 {
 
-    float *cop = prob;
+    double *cop = prob;
 
     quicksort(cop, 0, tam);
 
     int x = (int)(tam / 5);
     //float *maxProb = new float[x];
-    float *maxProb = (float *)malloc(sizeof(x));
+    double *maxProb = (double *)malloc(sizeof(x));
     for (size_t i = 0; i < x; i++)
     {
         maxProb[i] = cop[i];
@@ -77,7 +77,7 @@ float calculaQ(float melhorPeso, float media)
     return (pow((melhorPeso / media), 10));
 }
 
-void atualizaProbabilidade(float *probAlfas, float *q, int *pesoMed, int *melhorPeso, int tam)
+void atualizaProbabilidade(double *probAlfas, float *q, int *pesoMed, int *melhorPeso, int tam)
 {
     int somaQ = 0;
     for (size_t i = 0; i < tam; i++)
@@ -92,12 +92,12 @@ void atualizaProbabilidade(float *probAlfas, float *q, int *pesoMed, int *melhor
     }
 }
 
-void inicializaVetores(float *probAlfas, int *pesoMed, int peso, int tam)
+void inicializaVetores(double *probAlfas, int *pesoMed, int peso, int tam)
 {
 
     for (size_t i = 0; i < tam; i++)
     {
-        probAlfas[i] = 1 / tam;
+        probAlfas[i] = (double)1 / tam;
         pesoMed[i] = peso;
     }
 }
@@ -136,7 +136,7 @@ Grafo *gulosoRandomizadoReativo(Grafo *grafo, int d, float *alfas, int tamAlfa, 
     // float *q = new float[tamAlfa];
     // int *pesoMed = new int[tamAlfa];
 
-    float *probAlfas = (float *)malloc(sizeof(tamAlfa));
+    double *probAlfas = (double *)malloc(sizeof(tamAlfa));
     float *q = (float *)malloc(sizeof(tamAlfa));
     int *pesoMed = (int *)malloc(sizeof(tamAlfa));
     No *noFonte;
@@ -218,8 +218,8 @@ Grafo *gulosoRandomizadoReativo(Grafo *grafo, int d, float *alfas, int tamAlfa, 
         }
         
         atualizaMedias(pesoMed, tamAlfa, alphaIndex, pesoS, bloco);
-
-        cout << "FIM INTERACAO " << i << endl;
+        delete s;
+        
     }
 
     //solBest->criaListaAdjacencia();
