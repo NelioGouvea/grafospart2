@@ -148,27 +148,22 @@ Grafo *gulosoRandomizadoReativo(Grafo *grafo, int d, float *alfas, int tamAlfa, 
     inicializaVetores(probAlfas, pesoMed, *peso, tamAlfa);
     while (i < numIteracoes)
     {
-        cout << "INICIO INTERACAO " << i << endl;
 
         if (i % bloco == 0)
         {
-            cout << "ATUALIZA PROB " << endl;
             atualizaProbabilidade(probAlfas, q, pesoMed, peso, tamAlfa);
         }
 
         i++;
         //s = new Grafo(grafo->getOrdem(), false, true, false);
 
-        cout << "CRIA S " << endl;
         Grafo *s = (Grafo *)malloc(sizeof(Grafo));
         new (s) Grafo(grafo->getOrdem(), false, true, false);
         s->geraVetNo();
 
         int cont = 0;
 
-        cout << "ESCOLHE ALFA" << endl;
         alfa = escolheAlfa(probAlfas, tamAlfa);
-        cout << "ALFA " << alfa << endl;
         int cabaco = 0;
         AuxtodasArestas = todasArestas;
         do
@@ -203,37 +198,31 @@ Grafo *gulosoRandomizadoReativo(Grafo *grafo, int d, float *alfas, int tamAlfa, 
 
             AuxtodasArestas.remove(random);
             cabaco++;
-            cout << "K :" << k << "|Tentativa :" << cabaco << "|DO :" << cont << "|NUM ARESTAS :" << AuxtodasArestas.size() << endl;
             delete fecho;
         } while (cont < grafo->getOrdem() - 1);
 
-        cout << "REALIZA DO " << endl;
         s->criaListaAdjacencia();
-        cout << "LISTAADJ DE S " << endl;
+
         if (solBest == nullptr)
         {
-            cout << "IF" << endl;
             solBest = s;
         }
         else
         {
 
             int pesoSolBest = calculaPeso(solBest);
-            cout << "pesoSolBest :" << pesoSolBest << endl;
             pesoS = calculaPeso(s);
-            cout << "PesoS : " << pesoS << endl;
-            if (pesoS < pesoSolBest)
+            if (pesoS < pesoSolBest) {
                 solBest = s;
+            }
         }
-        cout << "ATUALIZA MEDIDA " << endl;
+        
         atualizaMedias(pesoMed, tamAlfa, alphaIndex, pesoS, bloco);
 
-        cout << "APAGA S" << endl;
-        delete s;
         cout << "FIM INTERACAO " << i << endl;
     }
 
-    solBest->criaListaAdjacencia();
+    //solBest->criaListaAdjacencia();
 
     *peso = calculaPeso(solBest);
 
