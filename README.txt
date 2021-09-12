@@ -12,3 +12,10 @@ g++ -O3 main.cpp Grafo/*.cpp -o execGrupo33
 
 Comando para execução:
 ./execGrupo33 input.txt output.txt
+
+Grau Restringido : 3
+
+Guloso Randomizado alfa : 0.5
+Guloso Randomizado Reativo alfas : ( 0.1, 0.2, 0.3, 0.4, 0.5 )
+
+Para execução utilizamos Guloso e Guloso Randomizado Reativo
