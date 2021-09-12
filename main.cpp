@@ -51,7 +51,7 @@ Grafo *leituraMST(ifstream &input_file)
     No *no1;
     No *no2;
     //adicionando aresta de um no para os demais
-    
+
     for (int i = 1; i <= ordem; i++)
     {
         for (int j = i + 1; j <= ordem; j++)
@@ -61,7 +61,7 @@ Grafo *leituraMST(ifstream &input_file)
             graph->inserirAresta(i, j, calculaPeso(no1->getX(), no1->getY(), no2->getX(), no2->getY()));
         }
     }
-   
+
     graph->criaListaAdjacencia();
 
     return graph;
@@ -158,7 +158,10 @@ void selecionar(int selecao, Grafo *graph, ofstream &output_file)
     {
         double tempo;
         int peso;
-        Grafo *arvore = gulosoRandomizado(graph, 3, 0.5, 3, &peso, &tempo);
+        float alfa;
+        cout << "Selecione o alfa a ser utilizado: " << endl;
+        cin >> alfa;
+        Grafo *arvore = gulosoRandomizado(graph, 3, alfa, 5, &peso, &tempo);
         preencheDot(output_file, arvore, "gulosoRandomizado");
         output_file << endl;
         output_file << "Peso total = " << peso << endl;
@@ -171,10 +174,12 @@ void selecionar(int selecao, Grafo *graph, ofstream &output_file)
         int peso;
         int tam = 5;
         //float *alfas = new float[tam];
-        float *alfas = (float*)malloc(sizeof(tam));
-        for (size_t i = 1; i <= tam; i++)
+        float *alfas = (float *)malloc(sizeof(tam));
+
+        cout << "Selecione os 5 alfas a serem utilizados: " << endl;
+        for (size_t i = 0; i < tam; i++)
         {
-            alfas[i-1] = i/10;
+           cin >> alfas[i];
         }
 
         Grafo *arvore = gulosoRandomizadoReativo(graph, 3, alfas, tam, 5, &peso, &tempo, 2);
@@ -217,10 +222,9 @@ int main(int argc, char const *argv[])
 {
 
     //Verificação se todos os parâmetros do programa foram entrados
-    if (argc != 6)
+    if (argc != 3)
     {
-
-        cout << "ERROR: Expecting: ./<program_name> <input_file> <output_file> <directed> <weighted_edge> <weighted_node> " << endl;
+        cout << "ERROR: Expecting: ./<program_name> <input_file> <output_file>" << endl;
         return 1;
     }
 

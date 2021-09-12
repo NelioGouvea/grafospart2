@@ -28,15 +28,19 @@ int randomRange(int menor, int maior) {
 Grafo* gulosoRandomizado(Grafo *grafo, int d, float alfa, int numIteracoes, int *peso, double *tempo) {
 	clock_t t = clock();
 	
+	//cria- se uma lista de arestas
 	list<Aresta*> todasArestas;
 
+	//ordena-se a lista pelo peso das arestas (da menor para maior)
 	ordenaVetorArestas(grafo, &todasArestas);
 
 	list<Aresta*> auxAresta = todasArestas;
 
+	//cria-se as arvores soluções
 	Grafo *s;
 	Grafo *solBest = nullptr;
 
+	//cria-se o contador de iterações
 	int i = 0, k;
 	while(i < numIteracoes) {
 		i++;
