@@ -155,6 +155,7 @@ float calculaPeso(Grafo *arvore)
 	float total = 0;
 
 
+	
 	for (auto a = listaNos.begin(); a != listaNos.end(); a++)
 	{
 		list<No *> adjacentes = (*a)->getNosAdjacentes();
@@ -165,7 +166,6 @@ float calculaPeso(Grafo *arvore)
 
 		visitados[(*a)->getId()] = true;
 	}
-
 
 	return total;
 }

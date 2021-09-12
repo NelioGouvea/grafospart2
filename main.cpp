@@ -182,7 +182,7 @@ void selecionar(int selecao, Grafo *graph, ofstream &output_file)
            cin >> alfas[i];
         }
 
-        Grafo *arvore = gulosoRandomizadoReativo(graph, 3, alfas, tam, 5, &peso, &tempo, 2);
+        Grafo *arvore = gulosoRandomizadoReativo(graph, 3, alfas, tam, 2, &peso, &tempo, 2);
         preencheDot(output_file, arvore, "gulosoRandomizado");
         output_file << endl;
         output_file << "Peso total = " << peso << endl;

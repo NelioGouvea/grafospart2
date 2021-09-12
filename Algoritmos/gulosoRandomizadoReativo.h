@@ -125,7 +125,7 @@ Grafo *gulosoRandomizadoReativo(Grafo *grafo, int d, float *alfas, int tamAlfa, 
     ordenaVetorArestas(grafo, &todasArestas);
 
     //cria-se as arvores soluções
-    Grafo *s;
+
     Grafo *solBest = nullptr;
 
     //cria-se variaveis de apoio: Contador (i)(j), valor randomico (k), index alpha
@@ -149,6 +149,7 @@ Grafo *gulosoRandomizadoReativo(Grafo *grafo, int d, float *alfas, int tamAlfa, 
 
     //inicializa os vetores criados com os valores iniciais
     inicializaVetores(probAlfas, pesoMed, *peso, tamAlfa);
+
     //executa ate alcançar o numero de iterações
     while (i < numIteracoes)
     {
@@ -158,16 +159,20 @@ Grafo *gulosoRandomizadoReativo(Grafo *grafo, int d, float *alfas, int tamAlfa, 
             //atualiza problabilidade a cada BLOCO numero de iteração
             atualizaProbabilidade(probAlfas, q, pesoMed, peso, tamAlfa);
         }
+
         i++;
 
-        //instancia a arvore a ser gerada 
-        s = new Grafo(grafo->getOrdem(), false, true, false);
+        //instancia a arvore a ser gerada
+        Grafo *s = new Grafo(grafo->getOrdem(), false, true, false);
+
         s->geraVetNo();
 
         int cont = 0;
+
         //escolhe o alfa a ser utilizado
         alfa = escolheAlfa(probAlfas, tamAlfa, &alphaIndex);
         int cabaco = 0;
+
         AuxtodasArestas = todasArestas;
         do
         {
@@ -194,7 +199,7 @@ Grafo *gulosoRandomizadoReativo(Grafo *grafo, int d, float *alfas, int tamAlfa, 
             //utiliza o fecho para verificar ciclos
             s->criaListaAdjacencia();
             fecho = fechoDireto(s, noFonte->getId());
- 
+
             if ((fecho->getListaNos().empty() || !fecho->procuraNo(noAlvo->getId())) && noAlvo->getGrau() < d && noFonte->getGrau() < d)
             {
 
@@ -204,12 +209,11 @@ Grafo *gulosoRandomizadoReativo(Grafo *grafo, int d, float *alfas, int tamAlfa, 
 
             //remove aresta da lista de arestas
             AuxtodasArestas.remove(random);
-           
+
             delete fecho;
         } while (cont < grafo->getOrdem() - 1);
 
         s->criaListaAdjacencia();
-
 
         //verifica se é a primeira iteração, caso não calcula os pesos e compara das arvores s e solbest
         if (solBest == nullptr)
@@ -237,7 +241,7 @@ Grafo *gulosoRandomizadoReativo(Grafo *grafo, int d, float *alfas, int tamAlfa, 
 
     t = clock() - t;
     *tempo = t / (double)CLOCKS_PER_SEC;
-    cout << "SAI" << endl;
+
     return solBest;
 }
 
