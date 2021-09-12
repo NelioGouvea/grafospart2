@@ -57,33 +57,28 @@ void quicksort(float *vet, int began, int end)
 float escolheAlfa(float *prob, int tam, int *alphaIndex)
 {
 
-    //copia a lista de probabilidades e ordena de forma crescente
     float *cop = prob;
+
     quicksort(cop, 0, tam);
 
-    //escolhe randomicamente entre a metade das probabilidade de maior valor
-    int x = (int)(tam / 2);
+    int x = (int)(tam / 5);
     //float *maxProb = new float[x];
     float *maxProb = (float *)malloc(sizeof(x));
     for (size_t i = 0; i < x; i++)
     {
         maxProb[i] = cop[i];
     }
-
     *alphaIndex = ((int)randomRange(0, x - 1));
     return maxProb[*alphaIndex];
 }
 
 float calculaQ(float melhorPeso, float media)
 {
-    //calcula o valor q para o calculo das probabilidades
     return (pow((melhorPeso / media), 10));
 }
 
 void atualizaProbabilidade(float *probAlfas, float *q, int *pesoMed, int *melhorPeso, int tam)
 {
-
-    //atualiza os valores qi
     int somaQ = 0;
     for (size_t i = 0; i < tam; i++)
     {
@@ -91,7 +86,6 @@ void atualizaProbabilidade(float *probAlfas, float *q, int *pesoMed, int *melhor
         somaQ += q[i];
     }
 
-    //atualiza as probabilidades com base em q
     for (size_t i = 0; i < tam; i++)
     {
         probAlfas[i] = q[i] / somaQ;
@@ -113,26 +107,31 @@ void atualizaMedias(int *pesoMed, int tamAlfa, int alfaIndex, float pesoS, int b
     pesoMed[alfaIndex] += (pesoS / bloco);
 }
 
+int procuraIndexAlfa(float *alfas, int tamAlfa, float alfa)
+{
+    for (size_t i = 0; i < tamAlfa; i++)
+    {
+        if (alfas[i] == alfa)
+            return i;
+    }
+
+    return -1;
+}
+
 Grafo *gulosoRandomizadoReativo(Grafo *grafo, int d, float *alfas, int tamAlfa, int numIteracoes, int *peso, double *tempo, int bloco)
 {
     clock_t t = clock();
 
-    //cria- se uma lista de arestas e uma lista auxiliar
     list<Aresta *> todasArestas;
     list<Aresta *> AuxtodasArestas;
-
-    //ordena-se a lista pelo peso das arestas (da menor para maior)
     ordenaVetorArestas(grafo, &todasArestas);
 
-    //cria-se as arvores soluções
-
+    Grafo *s;
     Grafo *solBest = nullptr;
 
-    //cria-se variaveis de apoio: Contador (i)(j), valor randomico (k), index alpha
     int i = 0, k, j, alphaIndex;
     float alfa;
     int pesoS;
-
     // float *probAlfas = new float[tamAlfa];
     // float *q = new float[tamAlfa];
     // int *pesoMed = new int[tamAlfa];
@@ -140,49 +139,39 @@ Grafo *gulosoRandomizadoReativo(Grafo *grafo, int d, float *alfas, int tamAlfa, 
     float *probAlfas = (float *)malloc(sizeof(tamAlfa));
     float *q = (float *)malloc(sizeof(tamAlfa));
     int *pesoMed = (int *)malloc(sizeof(tamAlfa));
-
     No *noFonte;
     No *noAlvo;
     Grafo *fecho;
     Aresta *random;
     *peso = 1;
 
-    //inicializa os vetores criados com os valores iniciais
     inicializaVetores(probAlfas, pesoMed, *peso, tamAlfa);
-
-    //executa ate alcançar o numero de iterações
     while (i < numIteracoes)
     {
 
         if (i % bloco == 0)
         {
-            //atualiza problabilidade a cada BLOCO numero de iteração
             atualizaProbabilidade(probAlfas, q, pesoMed, peso, tamAlfa);
         }
 
         i++;
+        //s = new Grafo(grafo->getOrdem(), false, true, false);
 
-        //instancia a arvore a ser gerada
-        Grafo *s = new Grafo(grafo->getOrdem(), false, true, false);
-
+        Grafo *s = (Grafo *)malloc(sizeof(Grafo));
+        new (s) Grafo(grafo->getOrdem(), false, true, false);
         s->geraVetNo();
 
         int cont = 0;
 
-        //escolhe o alfa a ser utilizado
         alfa = escolheAlfa(probAlfas, tamAlfa, &alphaIndex);
-        int cabaco = 0;
-
         AuxtodasArestas = todasArestas;
         do
         {
-
             srand(time(NULL));
-            //gera o numero randomico com base em alfa
+
             k = randomRange(0, alfa * (AuxtodasArestas.size() - 1));
 
             j = 0;
-            //procura a aresta correspondente
             for (auto aresta = AuxtodasArestas.begin(); aresta != AuxtodasArestas.end(); aresta++)
             {
                 if (j == k)
@@ -192,14 +181,13 @@ Grafo *gulosoRandomizadoReativo(Grafo *grafo, int d, float *alfas, int tamAlfa, 
                 j++;
             }
 
-            // seleciona os par de nós da aresta escolhida da sua extremidade
             noFonte = s->getNoVet(random->getFonteId());
             noAlvo = s->getNoVet(random->getAlvoId());
 
-            //utiliza o fecho para verificar ciclos
             s->criaListaAdjacencia();
-            fecho = fechoDireto(s, noFonte->getId());
 
+            fecho = fechoDireto(s, noFonte->getId());
+            
             if ((fecho->getListaNos().empty() || !fecho->procuraNo(noAlvo->getId())) && noAlvo->getGrau() < d && noFonte->getGrau() < d)
             {
 
@@ -207,7 +195,6 @@ Grafo *gulosoRandomizadoReativo(Grafo *grafo, int d, float *alfas, int tamAlfa, 
                 cont++;
             }
 
-            //remove aresta da lista de arestas
             AuxtodasArestas.remove(random);
 
             delete fecho;
@@ -215,7 +202,6 @@ Grafo *gulosoRandomizadoReativo(Grafo *grafo, int d, float *alfas, int tamAlfa, 
 
         s->criaListaAdjacencia();
 
-        //verifica se é a primeira iteração, caso não calcula os pesos e compara das arvores s e solbest
         if (solBest == nullptr)
         {
             solBest = s;
@@ -225,17 +211,17 @@ Grafo *gulosoRandomizadoReativo(Grafo *grafo, int d, float *alfas, int tamAlfa, 
 
             int pesoSolBest = calculaPeso(solBest);
             pesoS = calculaPeso(s);
-            if (pesoS < pesoSolBest)
-            {
+            if (pesoS < pesoSolBest) {
                 solBest = s;
             }
         }
-
-        //atualiza as medidas medias para atualização das probabilidades
+        
         atualizaMedias(pesoMed, tamAlfa, alphaIndex, pesoS, bloco);
 
-        delete s;
+
     }
+
+    //solBest->criaListaAdjacencia();
 
     *peso = calculaPeso(solBest);
 
